@@ -23,18 +23,18 @@ import {
 } from 'lucide-react';
 
 const tickets = [
-  { id: 'Case-1', status: 'OPEN', requester: 'John Doe', requesterImg: 'https://i.pravatar.cc/150?u=john', active: true },
-  { id: 'Case-2', status: 'OPEN', requester: 'Jane Walker', requesterImg: 'https://i.pravatar.cc/150?u=jane' },
-  { id: 'Case-3', status: 'CLOSED', requester: 'Evelyn Milton', requesterImg: 'https://i.pravatar.cc/150?u=evelyn' },
-  { id: 'Case-4', status: 'OPEN', requester: 'Sam Nelson', requesterImg: 'https://i.pravatar.cc/150?u=sam' },
-  { id: 'Case-5', status: 'OPEN', requester: 'Jane Walker', requesterImg: 'https://i.pravatar.cc/150?u=jane' },
-  { id: 'Case-6', status: 'CLOSED', requester: 'Emily Davis', requesterImg: 'https://i.pravatar.cc/150?u=emily' },
-  { id: 'Case-7', status: 'CLOSED', requester: 'Jane Walker', requesterImg: 'https://i.pravatar.cc/150?u=jane' },
-  { id: 'Case-8', status: 'OPEN', requester: 'Emma Watson', requesterImg: 'https://i.pravatar.cc/150?u=emma' },
-  { id: 'Case-9', status: 'OPEN', requester: 'Sam Nelson', requesterImg: 'https://i.pravatar.cc/150?u=sam' },
-  { id: 'Case-10', status: 'OPEN', requester: 'Sam Nelson', requesterImg: 'https://i.pravatar.cc/150?u=sam' },
-  { id: 'Case-11', status: 'OPEN', requester: 'Emma Watson', requesterImg: 'https://i.pravatar.cc/150?u=emma' },
-  { id: 'Case-12', status: 'OPEN', requester: 'Emma Watson', requesterImg: 'https://i.pravatar.cc/150?u=emma' },
+  { id: 'Case-1', status: 'OPEN', slaStatus: 'Running', requester: 'John Doe', requesterImg: 'https://i.pravatar.cc/150?u=john', active: true },
+  { id: 'Case-2', status: 'OPEN', slaStatus: 'Stopped', requester: 'Jane Walker', requesterImg: 'https://i.pravatar.cc/150?u=jane' },
+  { id: 'Case-3', status: 'CLOSED', slaStatus: 'Stopped', requester: 'Evelyn Milton', requesterImg: 'https://i.pravatar.cc/150?u=evelyn' },
+  { id: 'Case-4', status: 'OPEN', slaStatus: 'Running', requester: 'Sam Nelson', requesterImg: 'https://i.pravatar.cc/150?u=sam' },
+  { id: 'Case-5', status: 'OPEN', slaStatus: 'Running', requester: 'Jane Walker', requesterImg: 'https://i.pravatar.cc/150?u=jane' },
+  { id: 'Case-6', status: 'CLOSED', slaStatus: 'Stopped', requester: 'Emily Davis', requesterImg: 'https://i.pravatar.cc/150?u=emily' },
+  { id: 'Case-7', status: 'CLOSED', slaStatus: 'Stopped', requester: 'Jane Walker', requesterImg: 'https://i.pravatar.cc/150?u=jane' },
+  { id: 'Case-8', status: 'OPEN', slaStatus: 'Running', requester: 'Emma Watson', requesterImg: 'https://i.pravatar.cc/150?u=emma' },
+  { id: 'Case-9', status: 'OPEN', slaStatus: 'Stopped', requester: 'Sam Nelson', requesterImg: 'https://i.pravatar.cc/150?u=sam' },
+  { id: 'Case-10', status: 'OPEN', slaStatus: 'Running', requester: 'Sam Nelson', requesterImg: 'https://i.pravatar.cc/150?u=sam' },
+  { id: 'Case-11', status: 'OPEN', slaStatus: 'Running', requester: 'Emma Watson', requesterImg: 'https://i.pravatar.cc/150?u=emma' },
+  { id: 'Case-12', status: 'OPEN', slaStatus: 'Running', requester: 'Emma Watson', requesterImg: 'https://i.pravatar.cc/150?u=emma' },
 ];
 
 export const IncidentList: React.FC = () => {
@@ -101,6 +101,7 @@ export const IncidentList: React.FC = () => {
             <div className="w-6"><input type="checkbox" className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" /></div>
             <div className="w-16">ID</div>
             <div className="w-16">Status</div>
+            <div className="w-20 pl-2">SLA Status</div>
             <div className="flex-1 text-right">Requester</div>
         </div>
 
@@ -115,6 +116,11 @@ export const IncidentList: React.FC = () => {
                     <div className="w-16 flex-shrink-0">
                         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${t.status === 'OPEN' ? 'text-green-600 bg-green-100' : 'text-gray-500 bg-gray-100'}`}>
                             {t.status}
+                        </span>
+                    </div>
+                     <div className="w-20 flex-shrink-0 pl-2">
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${t.slaStatus === 'Running' ? 'text-blue-600 bg-blue-100' : 'text-gray-500 bg-gray-100'}`}>
+                            {t.slaStatus}
                         </span>
                     </div>
                     <div className="flex-1 flex justify-end items-center gap-2 min-w-0">

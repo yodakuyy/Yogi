@@ -13,7 +13,12 @@ import {
   Umbrella,
   Star,
   MessageCircle,
-  ChevronRight
+  ChevronRight,
+  User,
+  LogOut,
+  Building,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 import { IncidentList } from './IncidentList';
@@ -26,22 +31,41 @@ const inventoryData = [
 
 const COLORS = ['#4338CA', '#FDE047', '#4338CA'];
 
-export const Dashboard: React.FC = () => {
+interface DashboardProps {
+  onLogout: () => void;
+  onChangeDepartment: () => void;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onChangeDepartment }) => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'incidents'>('dashboard');
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[#F3F4F8] flex font-sans text-gray-800 relative">
+    <div className="min-h-screen bg-[#F3F4F8] flex font-sans text-gray-800 relative overflow-hidden">
       
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-100 flex flex-col fixed h-full z-10">
-        <div className="p-6 flex items-center space-x-3 mb-4">
-          <div className="text-indigo-600">
-            <Umbrella size={28} fill="currentColor" />
+      <aside 
+        className={`w-64 bg-white border-r border-gray-100 flex flex-col fixed h-full z-20 transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-64'
+        }`}
+      >
+        <div className="p-6 flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="text-indigo-600">
+              <Umbrella size={28} fill="currentColor" />
+            </div>
+            <div>
+              <h1 className="font-bold text-lg text-gray-800 leading-tight">Modena</h1>
+              <p className="text-xs text-gray-400">Servicedesk</p>
+            </div>
           </div>
-          <div>
-            <h1 className="font-bold text-lg text-gray-800 leading-tight">Modena</h1>
-            <p className="text-xs text-gray-400">Servicedesk</p>
-          </div>
+          <button 
+            onClick={() => setIsSidebarOpen(false)}
+            className="text-gray-400 hover:text-indigo-600 transition-colors p-1 rounded-md hover:bg-gray-50"
+          >
+            <PanelLeftClose size={18} />
+          </button>
         </div>
 
         <nav className="flex-1 px-4 space-y-1">
@@ -66,21 +90,73 @@ export const Dashboard: React.FC = () => {
         {/* Removed Create Incident Button from Sidebar as requested */}
         <div className="mt-auto"></div>
 
-        <div className="p-4 border-t border-gray-100 flex items-center justify-between">
+        <div className="p-4 border-t border-gray-100 flex items-center justify-between relative">
           <div className="flex items-center space-x-3">
              <img src="https://i.pravatar.cc/150?u=mary" alt="Profile" className="w-10 h-10 rounded-full border border-gray-200" />
              <div>
                <p className="text-sm font-bold text-gray-800">Mary Wells.45</p>
              </div>
           </div>
-          <button className="text-gray-400 hover:text-gray-600">
+          <button 
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+            className="text-gray-400 hover:text-gray-600 focus:outline-none p-1 rounded hover:bg-gray-50 transition-colors"
+          >
             <MoreVertical size={16} />
           </button>
+
+          {/* Profile Menu Dropdown */}
+          {showProfileMenu && (
+            <div className="absolute bottom-16 right-4 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-200 origin-bottom-right">
+                <button 
+                    onClick={() => setShowProfileMenu(false)}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                >
+                    <User size={16} className="text-gray-400" /> 
+                    <span className="font-medium">Profile</span>
+                </button>
+                <button 
+                    onClick={() => {
+                        setShowProfileMenu(false);
+                        onChangeDepartment();
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                >
+                    <Building size={16} className="text-gray-400" /> 
+                    <span className="font-medium">Change Department</span>
+                </button>
+                <div className="border-t border-gray-100 my-1"></div>
+                <button 
+                    onClick={() => {
+                        setShowProfileMenu(false);
+                        onLogout();
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
+                >
+                    <LogOut size={16} /> 
+                    <span className="font-medium">Logout</span>
+                </button>
+            </div>
+          )}
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 ml-64 p-8 overflow-y-auto h-screen">
+      <main 
+        className={`flex-1 p-8 overflow-y-auto h-screen transition-all duration-300 ease-in-out ${
+          isSidebarOpen ? 'ml-64' : 'ml-0'
+        }`}
+      >
+        {/* Expand Sidebar Button (Visible when sidebar is closed) */}
+        {!isSidebarOpen && (
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
+            className="fixed top-6 left-6 z-30 bg-white border border-gray-200 p-2 rounded-lg shadow-md hover:bg-gray-50 hover:text-indigo-600 text-gray-500 transition-all animate-in fade-in zoom-in-95 duration-200"
+            title="Open Sidebar"
+          >
+            <PanelLeftOpen size={20} />
+          </button>
+        )}
+
         {currentView === 'dashboard' ? (
           <DashboardContent />
         ) : (

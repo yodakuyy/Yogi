@@ -21,7 +21,12 @@ const App: React.FC = () => {
   };
 
   if (view === 'dashboard') {
-    return <Dashboard />;
+    return (
+      <Dashboard 
+        onLogout={() => setView('login')} 
+        onChangeDepartment={() => setView('services')} 
+      />
+    );
   }
 
   return (
