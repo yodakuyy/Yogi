@@ -9,7 +9,6 @@ import {
   ChevronLeft, 
   ChevronDown, 
   ChevronRight,
-  MoreHorizontal, 
   Paperclip, 
   Smile, 
   Send,
@@ -132,137 +131,163 @@ export const IncidentList: React.FC = () => {
         </div>
       </div>
 
-      {/* Middle Column: Chat Interface */}
-      <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden relative">
-        {/* Header */}
-        <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-             <div className="flex items-center gap-3">
-                 <button className="p-1 text-gray-400 hover:bg-gray-50 rounded transition-colors"><span className="text-lg">×</span></button>
-                 <div className="flex items-center gap-2">
-                     <button className="text-gray-400 hover:bg-gray-50 p-1 rounded transition-colors"><ChevronDown size={14} /></button>
-                     <h2 className="font-bold text-gray-800">Case-1</h2>
-                     <span className="text-[10px] font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded uppercase">Open</span>
-                 </div>
-             </div>
-             <div className="flex items-center gap-2 relative">
-                 <button className="text-xs font-bold text-red-500 bg-red-50 border border-red-100 px-3 py-1.5 rounded hover:bg-red-100 transition-colors">Cancel Ticket</button>
-                 
-                 <div className="relative">
-                    <button 
-                        onClick={() => setShowActionMenu(!showActionMenu)}
-                        className="text-xs font-medium text-gray-600 bg-white border border-gray-200 px-3 py-1.5 rounded hover:bg-gray-50 flex items-center gap-1 transition-colors"
-                    >
-                        Action <ChevronDown size={12}/>
-                    </button>
+      {/* Middle Column Container */}
+      <div className="flex-1 flex flex-col gap-4 overflow-hidden min-w-0">
+        
+        {/* Chat Interface (Combined with Description) */}
+        <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden relative">
+            {/* Header */}
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
+                <div className="flex items-center gap-3">
+                    <button className="p-1 text-gray-400 hover:bg-gray-50 rounded transition-colors"><span className="text-lg">×</span></button>
+                    <div className="flex items-center gap-2">
+                        <button className="text-gray-400 hover:bg-gray-50 p-1 rounded transition-colors"><ChevronDown size={14} /></button>
+                        <h2 className="font-bold text-gray-800">Case-1</h2>
+                        <span className="text-[10px] font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded uppercase">Open</span>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2 relative">
+                    <button className="text-xs font-bold text-red-500 bg-red-50 border border-red-100 px-3 py-1.5 rounded hover:bg-red-100 transition-colors">Cancel Ticket</button>
                     
-                    {showActionMenu && (
-                        <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-100 shadow-lg rounded-lg z-20 py-1 animate-in fade-in zoom-in-95 duration-200">
-                            <button className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium transition-colors">
-                                Pending
-                            </button>
-                            <button className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium transition-colors">
-                                Resolved
-                            </button>
-                        </div>
-                    )}
+                    <div className="relative">
+                        <button 
+                            onClick={() => setShowActionMenu(!showActionMenu)}
+                            className="text-xs font-medium text-gray-600 bg-white border border-gray-200 px-3 py-1.5 rounded hover:bg-gray-50 flex items-center gap-1 transition-colors"
+                        >
+                            Action <ChevronDown size={12}/>
+                        </button>
+                        
+                        {showActionMenu && (
+                            <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-100 shadow-lg rounded-lg z-20 py-1 animate-in fade-in zoom-in-95 duration-200">
+                                <button className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium transition-colors">
+                                    Pending
+                                </button>
+                                <button className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium transition-colors">
+                                    Resolved
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    <button className="text-xs font-medium text-cyan-600 bg-cyan-50 border border-cyan-100 px-3 py-1.5 rounded hover:bg-cyan-100 flex items-center gap-1 transition-colors">
+                        <ChevronRight size={12} className="rotate-180" /> View Less
+                    </button>
+                </div>
+            </div>
+
+            {/* Ticket Description Section (Integrated) */}
+            <div className="p-6 border-b border-gray-100 bg-white flex-shrink-0">
+                 <div className="space-y-4">
+                     <div>
+                         <h3 className="text-sm font-bold text-gray-900 mb-1">Subject:</h3>
+                         <p className="text-sm text-gray-600 font-medium uppercase tracking-wide">USER SAP LOCKED</p>
+                     </div>
+                     <div>
+                         <h3 className="text-sm font-bold text-gray-900 mb-1">Description:</h3>
+                         <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                            Halo tim IT,{'\n\n'}
+                            Mohon dibantu bukakan akun CCD019 karena terlocked,{'\n'}
+                            Password terakhir @Yp111
+                         </p>
+                     </div>
+                     <div>
+                         <h3 className="text-sm font-bold text-gray-900 mb-1">Category:</h3>
+                         <p className="text-sm text-gray-500">Software - SAP - Could Not Login to SAP</p>
+                     </div>
                  </div>
-
-                 <button className="text-xs font-medium text-cyan-600 bg-cyan-50 border border-cyan-100 px-3 py-1.5 rounded hover:bg-cyan-100 flex items-center gap-1 transition-colors">
-                     <ChevronRight size={12} className="rotate-180" /> View Less
-                 </button>
-             </div>
-        </div>
-
-        {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto p-6 bg-slate-50 space-y-6">
-            
-            {/* Bot Message */}
-            <div className="flex gap-4">
-               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">HB</div>
-               <div className="flex-1">
-                   <div className="flex items-center gap-2 mb-1">
-                       <span className="text-xs font-bold text-gray-800">Hippo Bot</span>
-                   </div>
-                   <div className="bg-[#1e1b4b] text-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-sm leading-relaxed">
-                       Thank you for contacting us. We have opened case Case-1 to address your request. Sincerely,
-                   </div>
-                   <div className="mt-1 flex items-center justify-end gap-3 text-[10px] text-gray-400">
-                       <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
-                       <span>28 Feb 2025 - 10:40 PM</span>
-                   </div>
-               </div>
             </div>
 
-            {/* User Message */}
-            <div className="flex gap-4">
-               <img src="https://i.pravatar.cc/150?u=john" className="flex-shrink-0 w-8 h-8 rounded-full border border-gray-200 shadow-sm" alt="John" />
-               <div className="flex-1">
-                   <div className="flex items-center gap-2 mb-1">
-                       <span className="text-xs font-bold text-gray-800">John Doe</span>
-                   </div>
-                   <div className="bg-white text-gray-800 p-4 rounded-r-xl rounded-bl-xl shadow-sm border border-gray-100 text-sm leading-relaxed">
-                       The user interface, while functional, was somewhat confusing in certain areas, making it challenging to navigate and use effectively. This lack of clarity could potentially hinder users from fully utilizing the platform's features. Additionally, the presence of several spelling and grammar mistakes throughout the system further impacts the overall user experience, as it may reduce the perceived professionalism and reliability...
-                       <div className="mt-1 text-indigo-600 text-xs font-semibold cursor-pointer underline">Read More</div>
-                   </div>
-                   <div className="mt-1 flex items-center justify-start gap-3 text-[10px] text-gray-400">
-                       <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
-                       <span>28 Feb 2025 - 12:40 PM</span>
-                   </div>
-               </div>
+            {/* Chat Area */}
+            <div className="flex-1 overflow-y-auto p-6 bg-slate-50 space-y-6">
+                
+                {/* Bot Message */}
+                <div className="flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">HB</div>
+                <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold text-gray-800">Hippo Bot</span>
+                    </div>
+                    <div className="bg-[#1e1b4b] text-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-sm leading-relaxed">
+                        Thank you for contacting us. We have opened case Case-1 to address your request. Sincerely,
+                    </div>
+                    <div className="mt-1 flex items-center justify-end gap-3 text-[10px] text-gray-400">
+                        <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
+                        <span>28 Feb 2025 - 10:40 PM</span>
+                    </div>
+                </div>
+                </div>
+
+                {/* User Message */}
+                <div className="flex gap-4">
+                <img src="https://i.pravatar.cc/150?u=john" className="flex-shrink-0 w-8 h-8 rounded-full border border-gray-200 shadow-sm" alt="John" />
+                <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold text-gray-800">John Doe</span>
+                    </div>
+                    <div className="bg-white text-gray-800 p-4 rounded-r-xl rounded-bl-xl shadow-sm border border-gray-100 text-sm leading-relaxed">
+                        The user interface, while functional, was somewhat confusing in certain areas, making it challenging to navigate and use effectively. This lack of clarity could potentially hinder users from fully utilizing the platform's features. Additionally, the presence of several spelling and grammar mistakes throughout the system further impacts the overall user experience, as it may reduce the perceived professionalism and reliability...
+                        <div className="mt-1 text-indigo-600 text-xs font-semibold cursor-pointer underline">Read More</div>
+                    </div>
+                    <div className="mt-1 flex items-center justify-start gap-3 text-[10px] text-gray-400">
+                        <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
+                        <span>28 Feb 2025 - 12:40 PM</span>
+                    </div>
+                </div>
+                </div>
+
+                {/* Agent Message */}
+                <div className="flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e1b4b] flex items-center justify-center text-white text-xs font-bold shadow-sm">A</div>
+                <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold text-gray-800">Agent</span>
+                    </div>
+                    <div className="bg-[#1e1b4b] text-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-sm leading-relaxed">
+                        Thank you for your feedback. We're working to improve the interface for better clarity and usability while also addressing any language errors. Your insights are invaluable, and we appreciate your help in making the platform better.
+                        <br/>Best regards,
+                    </div>
+                    <div className="mt-1 flex items-center justify-end gap-3 text-[10px] text-gray-400">
+                        <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
+                        <span>28 Feb 2025 - 10:45 PM</span>
+                    </div>
+                </div>
+                </div>
+
+                {/* Agent Message 2 */}
+                <div className="flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e1b4b] flex items-center justify-center text-white text-xs font-bold shadow-sm">A</div>
+                <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold text-gray-800">Agent</span>
+                    </div>
+                    <div className="bg-[#1e1b4b] text-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-sm leading-relaxed">
+                        Hello again,
+                        <br/><br/>
+                        We've made some updates based on your feedback. Could you please check and let us know if everything looks good on your end? Your input helps us refine the experience further.
+                        <br/>Best regards,
+                    </div>
+                    <div className="mt-1 flex items-center justify-end gap-3 text-[10px] text-gray-400">
+                        <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
+                        <span>28 Feb 2025 - 10:45 PM</span>
+                    </div>
+                </div>
+                </div>
             </div>
 
-            {/* Agent Message */}
-            <div className="flex gap-4">
-               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e1b4b] flex items-center justify-center text-white text-xs font-bold shadow-sm">A</div>
-               <div className="flex-1">
-                   <div className="flex items-center gap-2 mb-1">
-                       <span className="text-xs font-bold text-gray-800">Agent</span>
-                   </div>
-                   <div className="bg-[#1e1b4b] text-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-sm leading-relaxed">
-                       Thank you for your feedback. We're working to improve the interface for better clarity and usability while also addressing any language errors. Your insights are invaluable, and we appreciate your help in making the platform better.
-                       <br/>Best regards,
-                   </div>
-                   <div className="mt-1 flex items-center justify-end gap-3 text-[10px] text-gray-400">
-                       <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
-                       <span>28 Feb 2025 - 10:45 PM</span>
-                   </div>
-               </div>
-            </div>
-
-            {/* Agent Message 2 */}
-            <div className="flex gap-4">
-               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e1b4b] flex items-center justify-center text-white text-xs font-bold shadow-sm">A</div>
-               <div className="flex-1">
-                   <div className="flex items-center gap-2 mb-1">
-                       <span className="text-xs font-bold text-gray-800">Agent</span>
-                   </div>
-                   <div className="bg-[#1e1b4b] text-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-sm leading-relaxed">
-                       Hello again,
-                       <br/><br/>
-                       We've made some updates based on your feedback. Could you please check and let us know if everything looks good on your end? Your input helps us refine the experience further.
-                       <br/>Best regards,
-                   </div>
-                   <div className="mt-1 flex items-center justify-end gap-3 text-[10px] text-gray-400">
-                       <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
-                       <span>28 Feb 2025 - 10:45 PM</span>
-                   </div>
-               </div>
-            </div>
-        </div>
-
-        {/* Input Area */}
-        <div className="p-4 bg-white border-t border-gray-100">
-            <div className="flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-4 py-2 hover:border-indigo-200 transition-colors focus-within:border-indigo-400 focus-within:ring-1 focus-within:ring-indigo-100">
-                <input 
-                  type="text" 
-                  placeholder="Start Typing..." 
-                  className="flex-1 bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-400"
-                />
-                <button className="text-gray-400 hover:text-gray-600 transition-colors"><Paperclip size={18} /></button>
-                <button className="text-gray-400 hover:text-gray-600 transition-colors"><Smile size={18} /></button>
-                <button className="bg-cyan-500 hover:bg-cyan-600 text-white p-1.5 rounded-md transition-colors shadow-sm">
-                    <Send size={16} className="ml-0.5" />
-                </button>
+            {/* Input Area */}
+            <div className="p-4 bg-white border-t border-gray-100 flex-shrink-0">
+                <div className="flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-4 py-2 hover:border-indigo-200 transition-colors focus-within:border-indigo-400 focus-within:ring-1 focus-within:ring-indigo-100">
+                    <input 
+                    type="text" 
+                    placeholder="Start Typing..." 
+                    className="flex-1 bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-400"
+                    />
+                    <button className="text-gray-400 hover:text-gray-600 transition-colors"><Paperclip size={18} /></button>
+                    <button className="text-gray-400 hover:text-gray-600 transition-colors"><Smile size={18} /></button>
+                    <button className="bg-cyan-500 hover:bg-cyan-600 text-white p-1.5 rounded-md transition-colors shadow-sm">
+                        <Send size={16} className="ml-0.5" />
+                    </button>
+                </div>
             </div>
         </div>
 
