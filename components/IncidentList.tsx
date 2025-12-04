@@ -18,11 +18,12 @@ import {
   BookOpen,
   MessageCircle,
   Plus,
-  AlertCircle
+  AlertCircle,
+  X
 } from 'lucide-react';
 
 const tickets = [
-  { id: 'Case-1', status: 'OPEN', slaStatus: 'Running', requester: 'John Doe', requesterImg: 'https://i.pravatar.cc/150?u=john', active: true },
+  { id: 'Case-1', status: 'OPEN', slaStatus: 'Running', requester: 'John Doe', requesterImg: 'https://i.pravatar.cc/150?u=john' },
   { id: 'Case-2', status: 'OPEN', slaStatus: 'Stopped', requester: 'Jane Walker', requesterImg: 'https://i.pravatar.cc/150?u=jane' },
   { id: 'Case-3', status: 'CLOSED', slaStatus: 'Stopped', requester: 'Evelyn Milton', requesterImg: 'https://i.pravatar.cc/150?u=evelyn' },
   { id: 'Case-4', status: 'OPEN', slaStatus: 'Running', requester: 'Sam Nelson', requesterImg: 'https://i.pravatar.cc/150?u=sam' },
@@ -38,12 +39,61 @@ const tickets = [
 
 export const IncidentList: React.FC = () => {
   const [showActionMenu, setShowActionMenu] = useState(false);
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  
+  // State for selections and filters
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState({
+    ticketNumber: '',
+    status: '',
+    slaStatus: '',
+    requester: ''
+  });
+
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const clearFilters = () => {
+    setFilters({ ticketNumber: '', status: '', slaStatus: '', requester: '' });
+    setSearchQuery('');
+  };
+
+  // Filter Logic
+  const filteredTickets = tickets.filter(ticket => {
+    // 1. Global Search (Checks all fields)
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = 
+        ticket.id.toLowerCase().includes(query) || 
+        ticket.status.toLowerCase().includes(query) ||
+        ticket.slaStatus.toLowerCase().includes(query) ||
+        ticket.requester.toLowerCase().includes(query);
+
+    if (!matchesSearch) return false;
+
+    // 2. Specific Multi-Filters
+    if (filters.ticketNumber && !ticket.id.toLowerCase().includes(filters.ticketNumber.toLowerCase())) return false;
+    if (filters.status && ticket.status !== filters.status) return false;
+    if (filters.slaStatus && ticket.slaStatus !== filters.slaStatus) return false;
+    if (filters.requester && !ticket.requester.toLowerCase().includes(filters.requester.toLowerCase())) return false;
+
+    return true;
+  });
+
+  const handleCheckboxChange = (id: string) => {
+    if (selectedTicketId === id) {
+        setSelectedTicketId(null); // Deselect if already selected
+    } else {
+        setSelectedTicketId(id); // Select new (auto deselects others due to state)
+    }
+  };
 
   return (
     <div className="flex h-[calc(100vh-6rem)] gap-4 overflow-hidden">
       
       {/* Left Column: Ticket List */}
-      <div className="w-1/3 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
+      <div className="w-1/3 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden relative">
         
         {/* Create Incident Button */}
         <div className="p-4 pb-0">
@@ -62,10 +112,10 @@ export const IncidentList: React.FC = () => {
         </div>
 
         {/* Toolbar */}
-        <div className="p-3 border-b border-gray-100 space-y-3">
+        <div className="p-3 border-b border-gray-100 space-y-3 bg-white z-10">
              <div className="flex justify-between items-center">
                  <button className="flex items-center text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-3 py-1.5 w-full justify-between hover:bg-gray-100">
-                    <span>All Tickets (12)</span>
+                    <span>All Tickets ({filteredTickets.length})</span>
                     <ChevronDown size={14} className="text-gray-400" />
                  </button>
              </div>
@@ -73,15 +123,83 @@ export const IncidentList: React.FC = () => {
              <div className="flex items-center gap-2">
                  <div className="relative flex-1">
                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                     <input type="text" placeholder="Search" className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-md bg-gray-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-indigo-100 transition-colors" />
+                     <input 
+                        type="text" 
+                        placeholder="Search..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-md bg-gray-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-indigo-100 transition-colors" 
+                     />
                  </div>
-                 <button className="p-1.5 text-gray-500 hover:bg-gray-100 rounded border border-transparent hover:border-gray-200">
+                 <button 
+                    onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                    className={`p-1.5 rounded border transition-colors ${showFilterDropdown ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'text-gray-500 hover:bg-gray-100 border-transparent hover:border-gray-200'}`}
+                 >
                      <Filter size={16} />
                  </button>
              </div>
 
+             {/* Filter Dropdown */}
+             {showFilterDropdown && (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-2 text-xs animate-in slide-in-from-top-2 duration-200">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="font-bold text-gray-700">Advanced Filters</span>
+                        <button onClick={clearFilters} className="text-xs text-indigo-600 hover:underline">Clear All</button>
+                    </div>
+                    
+                    <div>
+                        <label className="block text-gray-500 mb-1">Ticket Number</label>
+                        <input 
+                            type="text" 
+                            value={filters.ticketNumber}
+                            onChange={(e) => handleFilterChange('ticketNumber', e.target.value)}
+                            className="w-full px-2 py-1 border border-gray-200 rounded bg-white focus:outline-none focus:border-indigo-300" 
+                            placeholder="e.g. Case-1"
+                        />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                        <div>
+                            <label className="block text-gray-500 mb-1">Status</label>
+                            <select 
+                                value={filters.status}
+                                onChange={(e) => handleFilterChange('status', e.target.value)}
+                                className="w-full px-2 py-1 border border-gray-200 rounded bg-white focus:outline-none focus:border-indigo-300"
+                            >
+                                <option value="">All</option>
+                                <option value="OPEN">OPEN</option>
+                                <option value="CLOSED">CLOSED</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-gray-500 mb-1">SLA Status</label>
+                            <select 
+                                value={filters.slaStatus}
+                                onChange={(e) => handleFilterChange('slaStatus', e.target.value)}
+                                className="w-full px-2 py-1 border border-gray-200 rounded bg-white focus:outline-none focus:border-indigo-300"
+                            >
+                                <option value="">All</option>
+                                <option value="Running">Running</option>
+                                <option value="Stopped">Stopped</option>
+                            </select>
+                        </div>
+                    </div>
+
+                     <div>
+                        <label className="block text-gray-500 mb-1">Requester</label>
+                        <input 
+                            type="text" 
+                            value={filters.requester}
+                            onChange={(e) => handleFilterChange('requester', e.target.value)}
+                            className="w-full px-2 py-1 border border-gray-200 rounded bg-white focus:outline-none focus:border-indigo-300" 
+                            placeholder="Name..."
+                        />
+                    </div>
+                </div>
+             )}
+
              <div className="flex justify-between items-center">
-                 <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded">
+                 <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded" onClick={() => {setSearchQuery(''); setFilters({ticketNumber:'', status:'', slaStatus:'', requester:''})}}>
                      <RotateCcw size={14} />
                  </button>
                  <div className="flex bg-gray-100 rounded-md p-0.5">
@@ -97,8 +215,8 @@ export const IncidentList: React.FC = () => {
 
         {/* List Header */}
         <div className="flex items-center px-4 py-2 bg-gray-50 text-[10px] font-bold text-gray-400 uppercase border-b border-gray-100">
-            <div className="w-6"><input type="checkbox" className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" /></div>
-            <div className="w-16">ID</div>
+            <div className="w-6"></div> {/* Placeholder for single checkbox visual alignment */}
+            <div className="w-28">Ticket Number</div>
             <div className="w-16">Status</div>
             <div className="w-20 pl-2">SLA Status</div>
             <div className="flex-1 text-right">Requester</div>
@@ -106,28 +224,44 @@ export const IncidentList: React.FC = () => {
 
         {/* Tickets Scroll Area */}
         <div className="flex-1 overflow-y-auto">
-            {tickets.map((t, i) => (
-                <div key={i} className={`flex items-center px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors ${t.active ? 'bg-indigo-50/60' : ''}`}>
-                    <div className="w-6 flex-shrink-0">
-                        <input type="checkbox" className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+            {filteredTickets.length > 0 ? (
+                filteredTickets.map((t, i) => (
+                    <div 
+                        key={i} 
+                        onClick={() => handleCheckboxChange(t.id)}
+                        className={`flex items-center px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors ${selectedTicketId === t.id ? 'bg-indigo-50/60' : ''}`}
+                    >
+                        <div className="w-6 flex-shrink-0">
+                            <input 
+                                type="checkbox" 
+                                checked={selectedTicketId === t.id}
+                                onChange={() => handleCheckboxChange(t.id)}
+                                className="rounded-full border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" 
+                            />
+                        </div>
+                        <div className="w-28 flex-shrink-0 text-sm font-medium text-gray-700 truncate pr-2" title={t.id}>{t.id}</div>
+                        <div className="w-16 flex-shrink-0">
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${t.status === 'OPEN' ? 'text-green-600 bg-green-100' : 'text-gray-500 bg-gray-100'}`}>
+                                {t.status}
+                            </span>
+                        </div>
+                        <div className="w-20 flex-shrink-0 pl-2">
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${t.slaStatus === 'Running' ? 'text-blue-600 bg-blue-100' : 'text-gray-500 bg-gray-100'}`}>
+                                {t.slaStatus}
+                            </span>
+                        </div>
+                        <div className="flex-1 flex justify-end items-center gap-2 min-w-0">
+                            <span className="text-xs text-gray-500 truncate">{t.requester}</span>
+                            <img src={t.requesterImg} alt="" className="w-6 h-6 rounded-full border border-gray-100" />
+                        </div>
                     </div>
-                    <div className="w-16 flex-shrink-0 text-sm font-medium text-gray-700">{t.id}</div>
-                    <div className="w-16 flex-shrink-0">
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${t.status === 'OPEN' ? 'text-green-600 bg-green-100' : 'text-gray-500 bg-gray-100'}`}>
-                            {t.status}
-                        </span>
-                    </div>
-                     <div className="w-20 flex-shrink-0 pl-2">
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${t.slaStatus === 'Running' ? 'text-blue-600 bg-blue-100' : 'text-gray-500 bg-gray-100'}`}>
-                            {t.slaStatus}
-                        </span>
-                    </div>
-                    <div className="flex-1 flex justify-end items-center gap-2 min-w-0">
-                        <span className="text-xs text-gray-500 truncate">{t.requester}</span>
-                        <img src={t.requesterImg} alt="" className="w-6 h-6 rounded-full border border-gray-100" />
-                    </div>
+                ))
+            ) : (
+                <div className="flex flex-col items-center justify-center h-40 text-gray-400 text-xs">
+                    <Search size={24} className="mb-2 opacity-50"/>
+                    No tickets found
                 </div>
-            ))}
+            )}
         </div>
       </div>
 
