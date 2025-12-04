@@ -325,27 +325,24 @@ export const IncidentList: React.FC = () => {
               </div>
           </div>
 
-           {/* Trello Card Details */}
+           {/* Additional Details (Was Trello) */}
            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
               <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-sm font-bold text-gray-800">Trello Card Details</h3>
-                  <div className="flex items-center gap-1 text-[10px] text-gray-400 cursor-pointer hover:text-indigo-600">
-                     Open Trello Card <ExternalLink size={8} />
-                  </div>
+                  <h3 className="text-sm font-bold text-gray-800">Additional Details</h3>
               </div>
               
               <div className="space-y-3">
                  <div>
-                    <label className="text-[10px] font-semibold text-gray-600 mb-1 block">Labels</label>
-                    <input type="text" value="Green" readOnly className="w-full text-xs p-2 border border-gray-200 rounded-md bg-white text-gray-800 focus:outline-none" />
+                    <label className="text-[10px] font-semibold text-gray-600 mb-1 block">Impact</label>
+                    <input type="text" value="Low" readOnly className="w-full text-xs p-2 border border-gray-200 rounded-md bg-white text-gray-800 focus:outline-none" />
                  </div>
                  <div>
-                    <label className="text-[10px] font-semibold text-gray-600 mb-1 block">List</label>
-                    <input type="text" value="Abc" readOnly className="w-full text-xs p-2 border border-gray-200 rounded-md bg-white text-gray-800 focus:outline-none" />
+                    <label className="text-[10px] font-semibold text-gray-600 mb-1 block">Tagging</label>
+                    <input type="text" value="#SAP" readOnly className="w-full text-xs p-2 border border-gray-200 rounded-md bg-white text-gray-800 focus:outline-none" />
                  </div>
                  <div>
-                    <label className="text-[10px] font-semibold text-gray-600 mb-1 block">Members</label>
-                    <input type="text" value="Jane Doe" readOnly className="w-full text-xs p-2 border border-gray-200 rounded-md bg-gray-50 text-gray-800 focus:outline-none" />
+                    <label className="text-[10px] font-semibold text-gray-600 mb-1 block">Agent Group</label>
+                    <input type="text" value="Service Desk" readOnly className="w-full text-xs p-2 border border-gray-200 rounded-md bg-gray-50 text-gray-800 focus:outline-none" />
                  </div>
                  <div>
                     <label className="text-[10px] font-semibold text-gray-600 mb-1 block">Priority</label>

@@ -5,7 +5,6 @@ import {
   Ticket, 
   Package, 
   BookOpen, 
-  Briefcase, 
   Settings, 
   Plus, 
   Search, 
@@ -40,8 +39,8 @@ export const Dashboard: React.FC = () => {
             <Umbrella size={28} fill="currentColor" />
           </div>
           <div>
-            <h1 className="font-bold text-lg text-gray-800 leading-tight">Poppins</h1>
-            <p className="text-xs text-gray-400">service desk</p>
+            <h1 className="font-bold text-lg text-gray-800 leading-tight">Modena</h1>
+            <p className="text-xs text-gray-400">Servicedesk</p>
           </div>
         </div>
 
@@ -61,16 +60,11 @@ export const Dashboard: React.FC = () => {
           />
           <NavItem icon={<Package size={18} />} label="Service Request" />
           <NavItem icon={<BookOpen size={18} />} label="Knowledge Base" />
-          <NavItem icon={<Briefcase size={18} />} label="Projects" badge="4" />
           <NavItem icon={<Settings size={18} />} label="Settings" />
         </nav>
 
-        <div className="p-4 mt-auto">
-          <button className="w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white py-3 rounded-lg flex items-center justify-center gap-2 font-medium shadow-md transition-all">
-            <Plus size={18} />
-            <span>Create an Incident</span>
-          </button>
-        </div>
+        {/* Removed Create Incident Button from Sidebar as requested */}
+        <div className="mt-auto"></div>
 
         <div className="p-4 border-t border-gray-100 flex items-center justify-between">
           <div className="flex items-center space-x-3">
