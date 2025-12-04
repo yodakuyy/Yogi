@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Search, 
   Filter, 
@@ -18,7 +18,8 @@ import {
   Info,
   BookOpen,
   MessageCircle,
-  Plus
+  Plus,
+  AlertCircle
 } from 'lucide-react';
 
 const tickets = [
@@ -37,6 +38,8 @@ const tickets = [
 ];
 
 export const IncidentList: React.FC = () => {
+  const [showActionMenu, setShowActionMenu] = useState(false);
+
   return (
     <div className="flex h-[calc(100vh-6rem)] gap-4 overflow-hidden">
       
@@ -135,9 +138,29 @@ export const IncidentList: React.FC = () => {
                      <span className="text-[10px] font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded uppercase">Open</span>
                  </div>
              </div>
-             <div className="flex items-center gap-2">
-                 <button className="text-xs font-medium text-gray-600 bg-white border border-gray-200 px-3 py-1.5 rounded hover:bg-gray-50 transition-colors">Close Ticket</button>
-                 <button className="text-xs font-medium text-gray-600 bg-white border border-gray-200 px-3 py-1.5 rounded hover:bg-gray-50 flex items-center gap-1 transition-colors">Action <ChevronDown size={12}/></button>
+             <div className="flex items-center gap-2 relative">
+                 <button className="text-xs font-bold text-red-500 bg-red-50 border border-red-100 px-3 py-1.5 rounded hover:bg-red-100 transition-colors">Cancel Ticket</button>
+                 
+                 <div className="relative">
+                    <button 
+                        onClick={() => setShowActionMenu(!showActionMenu)}
+                        className="text-xs font-medium text-gray-600 bg-white border border-gray-200 px-3 py-1.5 rounded hover:bg-gray-50 flex items-center gap-1 transition-colors"
+                    >
+                        Action <ChevronDown size={12}/>
+                    </button>
+                    
+                    {showActionMenu && (
+                        <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-100 shadow-lg rounded-lg z-20 py-1 animate-in fade-in zoom-in-95 duration-200">
+                            <button className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium transition-colors">
+                                Pending
+                            </button>
+                            <button className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium transition-colors">
+                                Resolved
+                            </button>
+                        </div>
+                    )}
+                 </div>
+
                  <button className="text-xs font-medium text-cyan-600 bg-cyan-50 border border-cyan-100 px-3 py-1.5 rounded hover:bg-cyan-100 flex items-center gap-1 transition-colors">
                      <ChevronRight size={12} className="rotate-180" /> View Less
                  </button>
@@ -250,8 +273,9 @@ export const IncidentList: React.FC = () => {
               </div>
               
               <div className="space-y-4">
+                  {/* Requester */}
                   <div>
-                      <div className="text-xs font-semibold text-gray-500 mb-2">Requester Information</div>
+                      <div className="text-xs font-semibold text-gray-500 mb-2">Requester</div>
                       <div className="flex items-center justify-between group cursor-pointer p-1 -mx-1 rounded hover:bg-gray-50">
                           <div className="flex items-center gap-2">
                               <img src="https://i.pravatar.cc/150?u=john" className="w-8 h-8 rounded-full border border-gray-100" alt="John" />
@@ -266,15 +290,50 @@ export const IncidentList: React.FC = () => {
                       </div>
                   </div>
 
+                  {/* Requested For */}
                   <div>
-                      <div className="text-xs font-semibold text-gray-500 mb-2">Shared with</div>
+                      <div className="text-xs font-semibold text-gray-500 mb-2">Requested For</div>
+                      <div className="flex items-center justify-between group cursor-pointer p-1 -mx-1 rounded hover:bg-gray-50">
+                          <div className="flex items-center gap-2">
+                              <img src="https://i.pravatar.cc/150?u=john" className="w-8 h-8 rounded-full border border-gray-100" alt="John" />
+                              <div className="overflow-hidden">
+                                  <div className="text-xs font-bold text-gray-800">John Doe</div>
+                                  <div className="text-[10px] text-gray-400 truncate">johndoe@gmail.com</div>
+                              </div>
+                          </div>
+                           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button className="p-1 bg-white border border-gray-200 rounded text-gray-400 hover:text-indigo-600"><Edit2 size={10} /></button>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Agent */}
+                  <div>
+                      <div className="text-xs font-semibold text-gray-500 mb-2">Agent</div>
+                      <div className="flex items-center justify-between group cursor-pointer p-1 -mx-1 rounded hover:bg-gray-50">
+                          <div className="flex items-center gap-2">
+                              <img src="https://i.pravatar.cc/150?u=mike" className="w-8 h-8 rounded-full border border-gray-100" alt="Mike" />
+                              <div className="overflow-hidden">
+                                  <div className="text-xs font-bold text-gray-800">Mike Ross</div>
+                                  <div className="text-[10px] text-gray-400 truncate">mikeross@modena.com</div>
+                              </div>
+                          </div>
+                           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button className="p-1 bg-white border border-gray-200 rounded text-gray-400 hover:text-indigo-600"><Edit2 size={10} /></button>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Second Layer Agent */}
+                  <div>
+                      <div className="text-xs font-semibold text-gray-500 mb-2">Second Layer Agent</div>
                       <div className="space-y-2">
                           <div className="flex items-center justify-between group cursor-pointer p-1 -mx-1 rounded hover:bg-gray-50">
                               <div className="flex items-center gap-2">
                                   <img src="https://i.pravatar.cc/150?u=jane" className="w-6 h-6 rounded-full border border-gray-100" alt="Jane" />
                                   <div>
                                       <div className="text-xs font-bold text-gray-800">Jane Walker</div>
-                                      <div className="text-[10px] text-gray-400">johndoe@gmail.com</div>
+                                      <div className="text-[10px] text-gray-400">Network Specialist</div>
                                   </div>
                               </div>
                               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -286,7 +345,7 @@ export const IncidentList: React.FC = () => {
                                   <img src="https://i.pravatar.cc/150?u=evelyn" className="w-6 h-6 rounded-full border border-gray-100" alt="Evelyn" />
                                   <div>
                                       <div className="text-xs font-bold text-gray-800">Evelyn Milton</div>
-                                      <div className="text-[10px] text-gray-400">johndoe@gmail.com</div>
+                                      <div className="text-[10px] text-gray-400">Database Admin</div>
                                   </div>
                               </div>
                               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -310,10 +369,61 @@ export const IncidentList: React.FC = () => {
                     <div className="text-xs text-gray-500 mb-0.5 flex items-center gap-1"><Info size={10} /> Ticket ID</div>
                     <div className="text-xs font-semibold text-gray-800">Case-1</div>
                  </div>
+
+                 {/* Urgency Field */}
+                 <div>
+                    <div className="text-xs text-gray-500 mb-0.5 flex items-center gap-1"><AlertCircle size={10} /> Urgency</div>
+                    <select className="w-full text-xs font-semibold text-gray-800 border border-gray-200 rounded p-1.5 bg-gray-50 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors cursor-pointer">
+                        <option value="Urgent">Urgent</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                 </div>
+
                  <div>
                     <div className="text-xs text-gray-500 mb-0.5 flex items-center gap-1"><RotateCcw size={10} /> Created Date</div>
                     <div className="text-xs font-semibold text-gray-800">28 Feb 2025 - 10:40 PM</div>
                  </div>
+
+                 {/* SLA Information */}
+                 <div className="border-t border-gray-100 pt-3 space-y-3">
+                    <div>
+                        <div className="text-[10px] font-bold text-gray-800">Standard SLA Response:</div>
+                        <div className="text-[10px] text-gray-500">3 hours</div>
+                    </div>
+                    <div>
+                        <div className="text-[10px] font-bold text-gray-800">Standard SLA Resolve:</div>
+                        <div className="text-[10px] text-gray-500">12 hours</div>
+                    </div>
+                    <div>
+                        <div className="text-[10px] font-bold text-gray-800">First Response Due Estimation:</div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] text-gray-500">02 Des 2025 15:30</span>
+                            <span className="bg-green-100 text-green-600 px-1.5 py-0.5 rounded text-[9px] font-bold">Within SLA</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div className="text-[10px] font-bold text-gray-800">Till First Response Due Estimation:</div>
+                        <div className="text-[10px] text-green-500 font-medium">+0 day 2 hours 29 minutes</div>
+                    </div>
+                    <div>
+                        <div className="text-[10px] font-bold text-gray-800">Resolve Due Estimation:</div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                             <span className="text-[10px] text-gray-500">08 Des 2025 11:43</span>
+                             <span className="bg-green-100 text-green-600 px-1.5 py-0.5 rounded text-[9px] font-bold">Within SLA</span>
+                        </div>
+                    </div>
+                     <div>
+                        <div className="text-[10px] font-bold text-gray-800">Till Resolve Due Estimation:</div>
+                        <div className="text-[10px] text-green-500 font-medium">+0 day 12 hours 0 minutes</div>
+                    </div>
+                     <div>
+                        <div className="text-[10px] font-bold text-gray-800">2nd Layer Resolution Timer:</div>
+                        <div className="text-[10px] text-gray-500">0 Minutes</div>
+                    </div>
+                 </div>
+
                  <div>
                     <div className="text-xs text-gray-500 mb-0.5 flex items-center gap-1"><MessageCircle size={10} /> Rating</div>
                     <div className="flex text-yellow-400 text-xs">★★★★☆</div>
