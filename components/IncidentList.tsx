@@ -33,7 +33,8 @@ import {
   Link as LinkIcon,
   List as ListIcon,
   ListOrdered,
-  Type
+  Type,
+  Check
 } from 'lucide-react';
 
 const tickets = [
@@ -73,6 +74,28 @@ export const IncidentList: React.FC = () => {
 
   // Escalate Modal State
   const [showEscalateModal, setShowEscalateModal] = useState(false);
+  const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
+  const [showEmailDropdown, setShowEmailDropdown] = useState(false);
+  const [emailSearch, setEmailSearch] = useState('');
+  
+  const emailOptions = [
+    "jane.walker@modena.com",
+    "evelyn.milton@modena.com",
+    "mike.ross@modena.com",
+    "sarah.connor@modena.com"
+  ];
+
+  const toggleEmail = (email: string) => {
+    if (selectedEmails.includes(email)) {
+        setSelectedEmails(selectedEmails.filter(e => e !== email));
+    } else {
+        setSelectedEmails([...selectedEmails, email]);
+    }
+  };
+
+  const removeEmail = (email: string) => {
+      setSelectedEmails(selectedEmails.filter(e => e !== email));
+  };
 
   // Right Sidebar Tabs
   const [activeTab, setActiveTab] = useState<'detail' | 'activities' | 'attachments'>('detail');
@@ -140,6 +163,11 @@ export const IncidentList: React.FC = () => {
     }
   };
 
+  // Filter email options based on search
+  const filteredEmailOptions = emailOptions.filter(email => 
+    email.toLowerCase().includes(emailSearch.toLowerCase())
+  );
+
   return (
     <div className="flex h-[calc(100vh-6rem)] gap-4 overflow-hidden relative">
       
@@ -179,7 +207,7 @@ export const IncidentList: React.FC = () => {
       {/* Escalate Modal Overlay */}
       {showEscalateModal && (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center animate-in fade-in duration-200">
-            <div className="bg-white rounded-lg shadow-2xl w-[600px] flex flex-col animate-in zoom-in-95 duration-200 overflow-hidden">
+            <div className="bg-white rounded-lg shadow-2xl w-[600px] flex flex-col animate-in zoom-in-95 duration-200 overflow-hidden max-h-[90vh]">
                 {/* Header */}
                 <div className="flex justify-between items-center p-4 border-b border-gray-200">
                     <h3 className="text-lg font-bold text-gray-800">Escalate to Second-Level Support</h3>
@@ -189,21 +217,78 @@ export const IncidentList: React.FC = () => {
                 </div>
                 
                 {/* Body */}
-                <div className="p-6 space-y-4">
-                    <div>
+                <div className="p-6 space-y-5 overflow-y-auto">
+                    {/* Helper Email Multi-Select */}
+                    <div className="relative">
                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                            Helper E-mail (From HRIS Sunfish) <span className="font-normal text-gray-500 italic">*type in lowercase only</span>
+                            Helper Email (Synchronized from HRIS Sunfish)
                         </label>
-                        <select className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-gray-600">
-                            <option value="">Select...</option>
-                            <option value="jane.walker@modena.com">jane.walker@modena.com</option>
-                            <option value="evelyn.milton@modena.com">evelyn.milton@modena.com</option>
-                        </select>
+                        
+                        <div 
+                            className="w-full border border-gray-300 rounded min-h-[42px] px-2 py-1 flex flex-wrap items-center gap-2 cursor-pointer bg-white"
+                            onClick={() => setShowEmailDropdown(!showEmailDropdown)}
+                        >
+                            {selectedEmails.length === 0 && (
+                                <span className="text-gray-500 text-sm ml-1">Select...</span>
+                            )}
+                            {selectedEmails.map(email => (
+                                <div key={email} className="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded-full flex items-center gap-1 font-medium">
+                                    {email}
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); removeEmail(email); }}
+                                        className="hover:text-indigo-900"
+                                    >
+                                        <X size={12} />
+                                    </button>
+                                </div>
+                            ))}
+                            <div className="ml-auto text-gray-400">
+                                <ChevronDown size={16} />
+                            </div>
+                        </div>
+
+                        {showEmailDropdown && (
+                            <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto">
+                                {/* Search Input */}
+                                <div className="p-2 sticky top-0 bg-white border-b border-gray-100 z-10">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search email..." 
+                                        value={emailSearch}
+                                        onChange={(e) => setEmailSearch(e.target.value)}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded focus:outline-none focus:border-indigo-300"
+                                        autoFocus
+                                    />
+                                </div>
+                                
+                                {filteredEmailOptions.length > 0 ? (
+                                    filteredEmailOptions.map(email => (
+                                        <div 
+                                            key={email}
+                                            onClick={() => toggleEmail(email)} 
+                                            className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center gap-3 text-sm text-gray-700"
+                                        >
+                                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${selectedEmails.includes(email) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-gray-300'}`}>
+                                                {selectedEmails.includes(email) && <Check size={10} />}
+                                            </div>
+                                            {email}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="px-4 py-2 text-xs text-gray-400">No results found</div>
+                                )}
+                            </div>
+                        )}
+                        {/* Overlay to close dropdown when clicking outside */}
+                        {showEmailDropdown && (
+                            <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShowEmailDropdown(false)}></div>
+                        )}
                     </div>
 
                     <div>
                         <label className="block text-sm font-bold text-gray-700 mb-1">
-                            Message to Helper: <span className="font-normal text-gray-500 italic">max. 2000 chars</span>
+                            Message to Helper <span className="font-normal text-gray-500 italic">(max. 2,000 characters)</span>
                         </label>
                         <div className="border border-gray-300 rounded overflow-hidden">
                             {/* Toolbar Simulation */}
@@ -226,7 +311,7 @@ export const IncidentList: React.FC = () => {
                     </div>
 
                     <p className="text-xs italic text-gray-600">
-                        * Please select e-mails only from the list shown.
+                        * Only email addresses listed in the dropdown can be selected.
                     </p>
                 </div>
 
