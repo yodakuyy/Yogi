@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
@@ -8,7 +8,7 @@ import {
   PanelLeft, 
   ChevronLeft, 
   ChevronDown, 
-  ChevronRight,
+  ChevronRight, 
   Paperclip, 
   Smile, 
   Send,
@@ -36,7 +36,16 @@ import {
   Type,
   Check,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Cloud,
+  Monitor,
+  FileSpreadsheet,
+  Users,
+  Star,
+  Calendar,
+  LayoutGrid,
+  Folder,
+  Share2
 } from 'lucide-react';
 
 const tickets = [
@@ -52,6 +61,19 @@ const tickets = [
   { id: 'Case-10', status: 'OPEN', slaStatus: 'Running', requester: 'Sam Nelson', requesterImg: 'https://i.pravatar.cc/150?u=sam' },
   { id: 'Case-11', status: 'OPEN', slaStatus: 'Running', requester: 'Emma Watson', requesterImg: 'https://i.pravatar.cc/150?u=emma' },
   { id: 'Case-12', status: 'OPEN', slaStatus: 'Running', requester: 'Emma Watson', requesterImg: 'https://i.pravatar.cc/150?u=emma' },
+];
+
+// Mock data for OneDrive
+const oneDriveFiles = [
+    { name: 'BOM WF Audit_a', type: 'excel', opened: 'Yesterday at 6:23 PM', owner: 'Jofian Purba', activity: 'Jofian Purba shared this in a Teams...' },
+    { name: 'AI Driven Servicedesk Transformation', type: 'ppt', opened: 'Wed at 1:16 PM', owner: 'Yogi Danis Fermana', activity: 'You shared this in a Teams chat • Nov 18' },
+    { name: 'Monthly_Network Connection Uptime_raw data', type: 'excel', opened: 'Wed at 10:51 AM', owner: 'Oca Rosnalita', activity: '' },
+    { name: 'Monthly_Application Uptime_raw data', type: 'excel', opened: 'Wed at 10:50 AM', owner: 'Oca Rosnalita', activity: '' },
+    { name: 'Monthly_Service Request_raw data', type: 'excel', opened: 'Wed at 10:50 AM', owner: 'Oca Rosnalita', activity: '' },
+    { name: 'Monthly_Incident (Complaint) Resolve Time_rawdata', type: 'excel', opened: 'Wed at 10:49 AM', owner: 'Oca Rosnalita', activity: '' },
+    { name: 'Monthly_Network Connection Uptime_raw data', type: 'excel', opened: 'Wed at 10:49 AM', owner: 'Oca Rosnalita', activity: '' },
+    { name: 'Pre Kickoff Meeting - Service Desk - Copy', type: 'ppt', opened: 'Wed at 7:56 AM', owner: 'Yogi Danis Fermana', activity: '' },
+    { name: 'AI Servicedesk', type: 'ppt', opened: 'Wed at 7:56 AM', owner: 'Yogi Danis Fermana', activity: '' },
 ];
 
 export const IncidentList: React.FC = () => {
@@ -83,6 +105,17 @@ export const IncidentList: React.FC = () => {
   // Chat Zoom State
   const [isChatZoomed, setIsChatZoomed] = useState(false);
   
+  // Chat Input State
+  const [chatInput, setChatInput] = useState('');
+  const [chatImages, setChatImages] = useState<string[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
+  // Attachment State
+  const [showAttachMenu, setShowAttachMenu] = useState(false);
+  const [showOneDriveModal, setShowOneDriveModal] = useState(false);
+  const [selectedCloudFile, setSelectedCloudFile] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const emailOptions = [
     "jane.walker@modena.com",
     "evelyn.milton@modena.com",
@@ -168,6 +201,84 @@ export const IncidentList: React.FC = () => {
     }
   };
 
+  // Chat Input Handlers
+  const handleChatInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setChatInput(e.target.value);
+    if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
+    }
+  };
+
+  const handleChatKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          handleSendMessage();
+      }
+  };
+
+  const handleChatPaste = (e: React.ClipboardEvent) => {
+      const items = e.clipboardData.items;
+      for (const item of items) {
+          if (item.type.indexOf('image') !== -1) {
+              const blob = item.getAsFile();
+              if (blob) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                      if (event.target?.result) {
+                          setChatImages(prev => [...prev, event.target!.result as string]);
+                      }
+                  };
+                  reader.readAsDataURL(blob);
+              }
+          }
+      }
+  };
+
+  const handleSendMessage = () => {
+      if (!chatInput.trim() && chatImages.length === 0) return;
+      console.log("Sending:", chatInput, chatImages);
+      
+      setChatInput('');
+      setChatImages([]);
+      if (textareaRef.current) {
+          textareaRef.current.style.height = 'auto';
+      }
+  };
+
+  const removeChatImage = (index: number) => {
+      setChatImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Attachment Handlers
+  const handleDeviceUpload = () => {
+    setShowAttachMenu(false);
+    if (fileInputRef.current) {
+        fileInputRef.current.click();
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+        // Mock handle file selection
+        alert(`Selected file: ${files[0].name}`);
+    }
+  };
+
+  const handleCloudAttach = () => {
+      setShowAttachMenu(false);
+      setShowOneDriveModal(true);
+  };
+
+  const handleOneDriveAttach = () => {
+      if (selectedCloudFile) {
+          alert(`Attached cloud file: ${selectedCloudFile}`);
+          setShowOneDriveModal(false);
+          setSelectedCloudFile(null);
+      }
+  };
+
   // Filter email options based on search
   const filteredEmailOptions = emailOptions.filter(email => 
     email.toLowerCase().includes(emailSearch.toLowerCase())
@@ -176,6 +287,127 @@ export const IncidentList: React.FC = () => {
   return (
     <div className="flex h-[calc(100vh-6rem)] gap-4 overflow-hidden relative">
       
+      {/* OneDrive Modal */}
+      {showOneDriveModal && (
+          <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center animate-in fade-in duration-200">
+              <div className="bg-white rounded-lg shadow-2xl w-[900px] h-[600px] flex flex-col animate-in zoom-in-95 duration-200 overflow-hidden">
+                  {/* Header */}
+                  <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-[#0078D4] text-white">
+                      <div className="font-semibold text-lg">OneDrive</div>
+                      <button onClick={() => setShowOneDriveModal(false)} className="hover:bg-white/20 p-1 rounded">
+                          <X size={20} />
+                      </button>
+                  </div>
+
+                  <div className="flex flex-1 overflow-hidden">
+                      {/* Sidebar */}
+                      <div className="w-64 bg-gray-50 border-r border-gray-200 p-4 flex flex-col gap-4 overflow-y-auto">
+                          <div className="space-y-1">
+                              <div className="flex items-center gap-3 px-3 py-2 bg-gray-200 rounded text-gray-800 font-medium cursor-pointer">
+                                  <Cloud size={16} /> Home
+                              </div>
+                              <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded cursor-pointer">
+                                  <Folder size={16} /> My files
+                              </div>
+                              <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded cursor-pointer">
+                                  <Users size={16} /> Shared
+                              </div>
+                              <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded cursor-pointer">
+                                  <Star size={16} /> Favorites
+                              </div>
+                          </div>
+
+                          <div>
+                              <div className="text-xs font-bold text-gray-500 mb-2 uppercase">Browse by</div>
+                              <div className="space-y-1">
+                                  <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded cursor-pointer">
+                                      <Users size={16} /> People
+                                  </div>
+                                  <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded cursor-pointer">
+                                      <Calendar size={16} /> Meetings
+                                  </div>
+                              </div>
+                          </div>
+
+                           <div>
+                              <div className="text-xs font-bold text-gray-500 mb-2 uppercase flex items-center gap-1">
+                                  Quick access <Info size={10}/>
+                              </div>
+                              <div className="space-y-1">
+                                  <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded cursor-pointer">
+                                      <div className="w-4 h-4 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[8px] font-bold">IT</div> DIT Group
+                                  </div>
+                                  <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded cursor-pointer">
+                                      <div className="w-4 h-4 rounded-full bg-black text-white flex items-center justify-center text-[8px] font-bold">M</div> MODENA Hub
+                                  </div>
+                                  <div className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded cursor-pointer">
+                                       <div className="w-4 h-4 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[8px] font-bold">M</div> Policies & P...
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+
+                      {/* Main Content */}
+                      <div className="flex-1 flex flex-col bg-white">
+                          <div className="p-4 border-b border-gray-100">
+                              <h2 className="text-xl font-semibold text-gray-800">Home</h2>
+                          </div>
+                          
+                          <div className="flex-1 overflow-y-auto">
+                              <table className="w-full text-left text-sm">
+                                  <thead className="bg-gray-50 text-gray-500 font-medium sticky top-0">
+                                      <tr>
+                                          <th className="px-4 py-2 w-8"></th> {/* Icon col */}
+                                          <th className="px-4 py-2">Name</th>
+                                          <th className="px-4 py-2">Opened</th>
+                                          <th className="px-4 py-2">Owner</th>
+                                          <th className="px-4 py-2">Activity</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-gray-50">
+                                      {oneDriveFiles.map((file, idx) => (
+                                          <tr 
+                                            key={idx} 
+                                            onClick={() => setSelectedCloudFile(file.name)}
+                                            className={`hover:bg-gray-50 cursor-pointer ${selectedCloudFile === file.name ? 'bg-blue-50' : ''}`}
+                                          >
+                                              <td className="px-4 py-3">
+                                                  {file.type === 'excel' ? <FileSpreadsheet size={16} className="text-green-600"/> : <FileText size={16} className="text-orange-500"/>}
+                                              </td>
+                                              <td className="px-4 py-3 font-medium text-gray-700">{file.name}</td>
+                                              <td className="px-4 py-3 text-gray-500">{file.opened}</td>
+                                              <td className="px-4 py-3 text-gray-500">{file.owner}</td>
+                                              <td className="px-4 py-3 text-gray-500 flex items-center gap-1">
+                                                {file.activity && <><Share2 size={12} className="text-blue-500"/> {file.activity}</>}
+                                              </td>
+                                          </tr>
+                                      ))}
+                                  </tbody>
+                              </table>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+                       <button 
+                          onClick={handleOneDriveAttach}
+                          disabled={!selectedCloudFile}
+                          className={`px-4 py-2 rounded text-sm font-medium transition-colors ${selectedCloudFile ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                       >
+                           Attach
+                       </button>
+                       <button 
+                          onClick={() => setShowOneDriveModal(false)}
+                          className="px-4 py-2 bg-white border border-gray-300 rounded text-sm font-medium text-gray-700 hover:bg-gray-50"
+                       >
+                           Cancel
+                       </button>
+                  </div>
+              </div>
+          </div>
+      )}
+
       {/* Pending Modal Overlay */}
       {showPendingModal && (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center animate-in fade-in duration-200">
@@ -664,16 +896,90 @@ export const IncidentList: React.FC = () => {
                 </div>
             </div>
 
-            {/* Input Area */}
+            {/* Input Area (New) */}
             <div className="p-4 bg-white border-t border-gray-100">
-                 <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-xl border border-gray-100">
-                    <input type="text" placeholder="Start Typing..." className="flex-1 bg-transparent border-none focus:ring-0 text-sm px-2 outline-none" />
-                    <button className="text-gray-400 hover:text-gray-600"><Paperclip size={18} /></button>
-                    <button className="text-gray-400 hover:text-gray-600"><Smile size={18} /></button>
-                    <button className="bg-cyan-500 hover:bg-cyan-600 text-white p-2 rounded-lg shadow-sm transition-colors">
-                        <Send size={16} />
-                    </button>
-                 </div>
+                <div className="bg-gray-50 p-2 rounded-xl border border-gray-100 focus-within:ring-1 focus-within:ring-indigo-100 transition-all">
+                    
+                    {/* Image Previews */}
+                    {chatImages.length > 0 && (
+                        <div className="flex gap-2 mb-2 overflow-x-auto p-2 bg-white rounded-lg border border-gray-100">
+                            {chatImages.map((img, idx) => (
+                                <div key={idx} className="relative group flex-shrink-0">
+                                    <img src={img} alt="pasted" className="h-20 w-auto rounded border border-gray-200 object-cover" />
+                                    <button 
+                                        onClick={() => removeChatImage(idx)}
+                                        className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                                        title="Remove image"
+                                    >
+                                        <X size={12} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="flex items-end gap-3">
+                        {/* Hidden File Input */}
+                        <input 
+                            type="file" 
+                            ref={fileInputRef} 
+                            className="hidden" 
+                            onChange={handleFileSelect}
+                        />
+
+                        <textarea 
+                            ref={textareaRef}
+                            value={chatInput}
+                            onChange={handleChatInputChange}
+                            onKeyDown={handleChatKeyDown}
+                            onPaste={handleChatPaste}
+                            placeholder="Start Typing... (Shift+Enter for new line, Ctrl+V for images)" 
+                            className="flex-1 bg-transparent border-none focus:ring-0 text-sm px-2 outline-none resize-none max-h-40 min-h-[40px] py-2.5 custom-scrollbar"
+                            rows={1}
+                            style={{ height: 'auto' }} 
+                        />
+                        
+                        {/* Buttons */}
+                        <div className="flex items-center gap-2 pb-1.5 relative">
+                            {/* Attachment Menu */}
+                            <div className="relative">
+                                <button 
+                                    onClick={() => setShowAttachMenu(!showAttachMenu)}
+                                    className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 transition-colors"
+                                >
+                                    <Paperclip size={18} />
+                                </button>
+                                {showAttachMenu && (
+                                    <div className="absolute bottom-full mb-2 right-0 origin-bottom-right w-48 bg-white border border-gray-100 shadow-xl rounded-lg overflow-hidden z-20 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                                        <button 
+                                            onClick={handleCloudAttach}
+                                            className="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                                        >
+                                            <Cloud size={14} className="text-blue-500"/> Attach Cloud files
+                                        </button>
+                                        <button 
+                                            onClick={handleDeviceUpload}
+                                            className="w-full text-left px-4 py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                                        >
+                                            <Monitor size={14} className="text-gray-500"/> Upload from this device
+                                        </button>
+                                    </div>
+                                )}
+                                {showAttachMenu && (
+                                    <div className="fixed inset-0 z-10" onClick={() => setShowAttachMenu(false)}></div>
+                                )}
+                            </div>
+
+                            <button className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 transition-colors"><Smile size={18} /></button>
+                            <button 
+                                onClick={handleSendMessage} 
+                                className="bg-cyan-500 hover:bg-cyan-600 text-white p-2 rounded-lg shadow-sm transition-colors"
+                            >
+                                <Send size={16} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
       </div>
