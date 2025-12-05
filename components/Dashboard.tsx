@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 import { IncidentList } from './IncidentList';
+import { ServiceRequestList } from './ServiceRequestList';
 import { KnowledgeBase } from './KnowledgeBase';
 import { OutOfOffice } from './OutOfOffice';
 
@@ -40,7 +41,7 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onChangeDepartment }) => {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'incidents' | 'knowledge-base' | 'out-of-office'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'incidents' | 'service-requests' | 'knowledge-base' | 'out-of-office'>('dashboard');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -86,7 +87,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onChangeDepartme
             active={currentView === 'incidents'}
             onClick={() => setCurrentView('incidents')}
           />
-          <NavItem icon={<Package size={18} />} label="Service Request" />
+          <NavItem 
+            icon={<Package size={18} />} 
+            label="Service Request" 
+            active={currentView === 'service-requests'}
+            onClick={() => setCurrentView('service-requests')}
+          />
           
           <NavItem 
             icon={<Briefcase size={18} />} 
@@ -201,6 +207,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onChangeDepartme
 
         {currentView === 'dashboard' && <DashboardContent />}
         {currentView === 'incidents' && <IncidentList />}
+        {currentView === 'service-requests' && <ServiceRequestList />}
         {currentView === 'knowledge-base' && <KnowledgeBase />}
         {currentView === 'out-of-office' && <OutOfOffice />}
       </main>
