@@ -19,7 +19,21 @@ import {
   MessageCircle,
   Plus,
   AlertCircle,
-  X
+  X,
+  FileText,
+  Image,
+  Download,
+  Clock,
+  CheckCircle,
+  Activity,
+  ArrowUpCircle,
+  Bold,
+  Italic,
+  Underline,
+  Link as LinkIcon,
+  List as ListIcon,
+  ListOrdered,
+  Type
 } from 'lucide-react';
 
 const tickets = [
@@ -56,6 +70,12 @@ export const IncidentList: React.FC = () => {
   const [ticketDetailSlaStatus, setTicketDetailSlaStatus] = useState('Running');
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [pendingRemark, setPendingRemark] = useState('');
+
+  // Escalate Modal State
+  const [showEscalateModal, setShowEscalateModal] = useState(false);
+
+  // Right Sidebar Tabs
+  const [activeTab, setActiveTab] = useState<'detail' | 'activities' | 'attachments'>('detail');
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -151,6 +171,73 @@ export const IncidentList: React.FC = () => {
                     >
                         Cancel
                     </button>
+                </div>
+            </div>
+        </div>
+      )}
+
+      {/* Escalate Modal Overlay */}
+      {showEscalateModal && (
+        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center animate-in fade-in duration-200">
+            <div className="bg-white rounded-lg shadow-2xl w-[600px] flex flex-col animate-in zoom-in-95 duration-200 overflow-hidden">
+                {/* Header */}
+                <div className="flex justify-between items-center p-4 border-b border-gray-200">
+                    <h3 className="text-lg font-bold text-gray-800">Escalate to Second-Level Support</h3>
+                    <button onClick={() => setShowEscalateModal(false)} className="text-gray-400 hover:text-gray-600">
+                        <X size={20} />
+                    </button>
+                </div>
+                
+                {/* Body */}
+                <div className="p-6 space-y-4">
+                    <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-1">
+                            Helper E-mail (From HRIS Sunfish) <span className="font-normal text-gray-500 italic">*type in lowercase only</span>
+                        </label>
+                        <select className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-gray-600">
+                            <option value="">Select...</option>
+                            <option value="jane.walker@modena.com">jane.walker@modena.com</option>
+                            <option value="evelyn.milton@modena.com">evelyn.milton@modena.com</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-1">
+                            Message to Helper: <span className="font-normal text-gray-500 italic">max. 2000 chars</span>
+                        </label>
+                        <div className="border border-gray-300 rounded overflow-hidden">
+                            {/* Toolbar Simulation */}
+                            <div className="flex items-center gap-2 bg-gray-50 border-b border-gray-200 p-2 text-gray-600">
+                                <span className="text-xs font-medium mr-2">Normal</span>
+                                <div className="h-4 w-px bg-gray-300 mx-1"></div>
+                                <button className="hover:bg-gray-200 p-1 rounded"><Bold size={14}/></button>
+                                <button className="hover:bg-gray-200 p-1 rounded"><Italic size={14}/></button>
+                                <button className="hover:bg-gray-200 p-1 rounded"><Underline size={14}/></button>
+                                <button className="hover:bg-gray-200 p-1 rounded"><LinkIcon size={14}/></button>
+                                <div className="h-4 w-px bg-gray-300 mx-1"></div>
+                                <button className="hover:bg-gray-200 p-1 rounded"><ListIcon size={14}/></button>
+                                <button className="hover:bg-gray-200 p-1 rounded"><ListOrdered size={14}/></button>
+                                <button className="hover:bg-gray-200 p-1 rounded"><Type size={14}/></button>
+                            </div>
+                            <textarea 
+                                className="w-full h-40 p-3 text-sm focus:outline-none resize-none"
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <p className="text-xs italic text-gray-600">
+                        * Please select e-mails only from the list shown.
+                    </p>
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 bg-gray-50 border-t border-gray-200">
+                     <button 
+                        onClick={() => setShowEscalateModal(false)}
+                        className="w-full bg-[#525252] hover:bg-[#404040] text-white font-bold py-3 rounded text-sm transition-colors"
+                     >
+                         Send
+                     </button>
                 </div>
             </div>
         </div>
@@ -372,8 +459,11 @@ export const IncidentList: React.FC = () => {
                         )}
                     </div>
 
-                    <button className="text-xs font-medium text-cyan-600 bg-cyan-50 border border-cyan-100 px-3 py-1.5 rounded hover:bg-cyan-100 flex items-center gap-1 transition-colors">
-                        <ChevronRight size={12} className="rotate-180" /> View Less
+                    <button 
+                        onClick={() => setShowEscalateModal(true)}
+                        className="text-xs font-medium text-cyan-600 bg-cyan-50 border border-cyan-100 px-3 py-1.5 rounded hover:bg-cyan-100 flex items-center gap-1 transition-colors"
+                    >
+                        <ArrowUpCircle size={14} /> Escalate
                     </button>
                 </div>
             </div>
@@ -490,197 +580,302 @@ export const IncidentList: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Column: Ticket Info */}
-      <div className="w-80 flex flex-col gap-4 overflow-y-auto pr-1 pb-4">
+      {/* Right Column: Ticket Info & Tabs */}
+      <div className="w-80 flex flex-col gap-4 overflow-hidden">
          
-         {/* Contact Details Card */}
-         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-             <div className="flex justify-between items-center mb-4 cursor-pointer">
-                 <h3 className="font-bold text-gray-900 text-sm">Contact Details</h3>
-                 <ChevronDown size={14} className="text-gray-400" />
-             </div>
+         {/* Tab Header */}
+         <div className="flex items-center justify-between border-b border-gray-200 pb-2 mx-1 mt-1">
+             <button 
+                onClick={() => setActiveTab('detail')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'detail' ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
+             >
+                 <Info size={14} /> Detail
+             </button>
+             <button 
+                onClick={() => setActiveTab('activities')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'activities' ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
+             >
+                 <List size={14} /> Activities
+             </button>
+             <button 
+                onClick={() => setActiveTab('attachments')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'attachments' ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
+             >
+                 <Paperclip size={14} /> Attachments
+             </button>
+         </div>
+
+         {/* Tab Content Area */}
+         <div className="flex-1 overflow-y-auto pr-1 pb-4 space-y-4">
              
-             <div className="space-y-4">
-                 {/* Requester */}
-                 <div>
-                     <p className="text-xs text-gray-500 mb-2">Requester</p>
-                     <div className="flex items-center gap-3">
-                         <img src="https://i.pravatar.cc/150?u=john" alt="User" className="w-8 h-8 rounded-full" />
-                         <div className="overflow-hidden">
-                             <p className="text-sm font-bold text-gray-800">John Doe</p>
-                             <p className="text-xs text-gray-400 truncate">johndoe@gmail.com</p>
+             {/* DETAIL VIEW */}
+             {activeTab === 'detail' && (
+                <>
+                 {/* Contact Details Card */}
+                 <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 animate-in fade-in slide-in-from-right-2 duration-300">
+                     <div className="flex justify-between items-center mb-4 cursor-pointer">
+                         <h3 className="font-bold text-gray-900 text-sm">Contact Details</h3>
+                         <ChevronDown size={14} className="text-gray-400" />
+                     </div>
+                     
+                     <div className="space-y-4">
+                         {/* Requester */}
+                         <div>
+                             <p className="text-xs text-gray-500 mb-2">Requester</p>
+                             <div className="flex items-center gap-3">
+                                 <img src="https://i.pravatar.cc/150?u=john" alt="User" className="w-8 h-8 rounded-full" />
+                                 <div className="overflow-hidden">
+                                     <p className="text-sm font-bold text-gray-800">John Doe</p>
+                                     <p className="text-xs text-gray-400 truncate">johndoe@gmail.com</p>
+                                 </div>
+                                 <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+                             </div>
                          </div>
-                         <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+
+                         {/* Requested For */}
+                         <div>
+                             <p className="text-xs text-gray-500 mb-2">Requested For</p>
+                             <div className="flex items-center gap-3">
+                                 <img src="https://i.pravatar.cc/150?u=john" alt="User" className="w-8 h-8 rounded-full" />
+                                 <div className="overflow-hidden">
+                                     <p className="text-sm font-bold text-gray-800">John Doe</p>
+                                     <p className="text-xs text-gray-400 truncate">johndoe@gmail.com</p>
+                                 </div>
+                                 <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+                             </div>
+                         </div>
+
+                         {/* Agent */}
+                         <div>
+                             <p className="text-xs text-gray-500 mb-2">Agent</p>
+                             <div className="flex items-center gap-3">
+                                 <img src="https://i.pravatar.cc/150?u=mike" alt="User" className="w-8 h-8 rounded-full" />
+                                 <div className="overflow-hidden">
+                                     <p className="text-sm font-bold text-gray-800">Mike Ross</p>
+                                     <p className="text-xs text-gray-400 truncate">Support Agent</p>
+                                 </div>
+                             </div>
+                         </div>
+
+                         {/* Second Layer Agent */}
+                         <div>
+                             <p className="text-xs text-gray-500 mb-2">Second Layer Agent</p>
+                             <div className="space-y-3">
+                                 <div className="flex items-center gap-3">
+                                     <img src="https://i.pravatar.cc/150?u=jane" alt="User" className="w-8 h-8 rounded-full" />
+                                     <div>
+                                         <p className="text-sm font-bold text-gray-800">Jane Walker</p>
+                                         <p className="text-xs text-gray-400">Network Specialist</p>
+                                     </div>
+                                     <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+                                 </div>
+                                 <div className="flex items-center gap-3">
+                                     <img src="https://i.pravatar.cc/150?u=evelyn" alt="User" className="w-8 h-8 rounded-full" />
+                                     <div>
+                                         <p className="text-sm font-bold text-gray-800">Evelyn Milton</p>
+                                         <p className="text-xs text-gray-400">Database Admin</p>
+                                     </div>
+                                     <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+                                 </div>
+                             </div>
+                         </div>
                      </div>
                  </div>
 
-                 {/* Requested For */}
-                 <div>
-                     <p className="text-xs text-gray-500 mb-2">Requested For</p>
-                     <div className="flex items-center gap-3">
-                         <img src="https://i.pravatar.cc/150?u=john" alt="User" className="w-8 h-8 rounded-full" />
-                         <div className="overflow-hidden">
-                             <p className="text-sm font-bold text-gray-800">John Doe</p>
-                             <p className="text-xs text-gray-400 truncate">johndoe@gmail.com</p>
+                 {/* Ticket Details Card */}
+                 <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 animate-in fade-in slide-in-from-right-3 duration-300">
+                     <div className="flex justify-between items-center mb-4 cursor-pointer">
+                         <h3 className="font-bold text-gray-900 text-sm">Ticket Details</h3>
+                         <ChevronDown size={14} className="text-gray-400" />
+                     </div>
+                     
+                     <div className="space-y-4">
+                         <div>
+                             <div className="flex items-center gap-1 text-gray-400 mb-1">
+                                 <Info size={12} />
+                                 <span className="text-xs">Ticket ID</span>
+                             </div>
+                             <p className="text-sm font-bold text-gray-800">Case-1</p>
                          </div>
-                         <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+
+                         <div>
+                             <label className="text-xs text-gray-500 block mb-1">Urgency</label>
+                             <select className="w-full text-xs border border-gray-200 rounded p-1.5 bg-gray-50 focus:outline-none">
+                                 <option>Urgent</option>
+                                 <option>High</option>
+                                 <option>Medium</option>
+                                 <option>Low</option>
+                             </select>
+                         </div>
+
+                         <div>
+                             <div className="flex items-center gap-1 text-gray-400 mb-1">
+                                 <RotateCcw size={12} />
+                                 <span className="text-xs">Created Date</span>
+                             </div>
+                             <p className="text-sm font-bold text-gray-800">28 Feb 2025 - 10:40 PM</p>
+                         </div>
+
+                         {/* SLA Details */}
+                         <div className="pt-2 border-t border-gray-100 space-y-3">
+                             <div>
+                                 <p className="text-xs font-bold text-gray-800">Standard SLA Response:</p>
+                                 <p className="text-xs text-gray-500">3 hours</p>
+                             </div>
+                             <div>
+                                 <p className="text-xs font-bold text-gray-800">Standard SLA Resolve:</p>
+                                 <p className="text-xs text-gray-500">12 hours</p>
+                             </div>
+                             
+                             <div>
+                                 <p className="text-xs font-bold text-gray-800">First Response Due Estimation:</p>
+                                 <div className="flex items-center gap-2">
+                                     <span className="text-xs text-gray-600">02 Dec 2025 15:30</span>
+                                     <span className="text-[10px] bg-green-100 text-green-600 font-bold px-1.5 rounded">Within SLA</span>
+                                 </div>
+                             </div>
+                             <div>
+                                 <p className="text-xs font-bold text-gray-800">Till First Response Due Estimation:</p>
+                                 <p className="text-xs font-bold text-teal-400">+0 day 2 hours 29 minutes</p>
+                             </div>
+
+                             <div>
+                                 <p className="text-xs font-bold text-gray-800">Resolve Due Estimation:</p>
+                                 <div className="flex items-center gap-2">
+                                     <span className="text-xs text-gray-600">08 Dec 2025 11:43</span>
+                                     <span className="text-[10px] bg-green-100 text-green-600 font-bold px-1.5 rounded">Within SLA</span>
+                                 </div>
+                             </div>
+                             <div>
+                                 <p className="text-xs font-bold text-gray-800">Till Resolve Due Estimation:</p>
+                                 <p className="text-xs font-bold text-teal-400">+0 day 12 hours 0 minutes</p>
+                             </div>
+                             
+                             <div>
+                                 <p className="text-xs font-bold text-gray-800">2nd Layer Resolution Timer:</p>
+                                 <p className="text-xs text-gray-500">0 Minutes</p>
+                             </div>
+                         </div>
+
+                         <div>
+                             <div className="flex items-center gap-1 text-gray-400 mb-1">
+                                 <MessageCircle size={12} />
+                                 <span className="text-xs">Rating</span>
+                             </div>
+                             <div className="flex text-yellow-400 text-xs">★★★★☆</div>
+                         </div>
+
+                         <div className="bg-orange-50 border border-orange-100 p-3 rounded-lg text-xs text-orange-600 leading-relaxed">
+                             I appreciate the prompt response and acknowledgment of my feedback. It's reassuring
+                             <span className="block font-bold underline cursor-pointer mt-1">Show more</span>
+                         </div>
                      </div>
                  </div>
 
-                 {/* Agent */}
-                 <div>
-                     <p className="text-xs text-gray-500 mb-2">Agent</p>
-                     <div className="flex items-center gap-3">
-                         <img src="https://i.pravatar.cc/150?u=mike" alt="User" className="w-8 h-8 rounded-full" />
-                         <div className="overflow-hidden">
-                             <p className="text-sm font-bold text-gray-800">Mike Ross</p>
-                             <p className="text-xs text-gray-400 truncate">Support Agent</p>
-                         </div>
+                 {/* Other Details Card */}
+                 <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 animate-in fade-in slide-in-from-right-4 duration-300">
+                     <div className="flex justify-between items-center mb-4">
+                         <h3 className="font-bold text-gray-900 text-sm">Other Details</h3>
                      </div>
-                 </div>
-
-                 {/* Second Layer Agent */}
-                 <div>
-                     <p className="text-xs text-gray-500 mb-2">Second Layer Agent</p>
+                     
                      <div className="space-y-3">
-                         <div className="flex items-center gap-3">
-                             <img src="https://i.pravatar.cc/150?u=jane" alt="User" className="w-8 h-8 rounded-full" />
-                             <div>
-                                 <p className="text-sm font-bold text-gray-800">Jane Walker</p>
-                                 <p className="text-xs text-gray-400">Network Specialist</p>
+                         <div>
+                             <label className="text-xs text-gray-500 block mb-1">Impact</label>
+                             <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">Low</div>
+                         </div>
+                         
+                         <div>
+                             <label className="text-xs text-gray-500 block mb-1">Tagging</label>
+                             <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">#SAP</div>
+                         </div>
+
+                         <div>
+                             <label className="text-xs text-gray-500 block mb-1">Agent Group</label>
+                             <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">Service Desk</div>
+                         </div>
+                         
+                         <div>
+                             <label className="text-xs text-gray-500 block mb-1">Priority</label>
+                             <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">High</div>
+                         </div>
+                     </div>
+                 </div>
+                </>
+             )}
+
+             {/* ACTIVITIES VIEW */}
+             {activeTab === 'activities' && (
+                 <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 animate-in fade-in slide-in-from-right-2 duration-300">
+                     <h3 className="font-bold text-gray-900 text-sm mb-4 flex items-center gap-2">
+                         <Activity size={16} /> Activity Log
+                     </h3>
+                     <div className="relative pl-4 space-y-6 border-l border-gray-200 ml-2">
+                         <div className="relative">
+                             <div className="absolute -left-[21px] bg-green-100 p-1 rounded-full text-green-600 border border-white shadow-sm">
+                                 <CheckCircle size={10} />
                              </div>
-                             <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+                             <p className="text-xs font-bold text-gray-800">Status changed from New to Open</p>
+                             <p className="text-xs text-gray-500 mt-1">by System</p>
+                             <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1"><Clock size={10}/> 28 Feb 2025 - 10:40 PM</p>
                          </div>
-                         <div className="flex items-center gap-3">
-                             <img src="https://i.pravatar.cc/150?u=evelyn" alt="User" className="w-8 h-8 rounded-full" />
-                             <div>
-                                 <p className="text-sm font-bold text-gray-800">Evelyn Milton</p>
-                                 <p className="text-xs text-gray-400">Database Admin</p>
+                         <div className="relative">
+                             <div className="absolute -left-[21px] bg-blue-100 p-1 rounded-full text-blue-600 border border-white shadow-sm">
+                                 <Plus size={10} />
                              </div>
-                             <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+                             <p className="text-xs font-bold text-gray-800">Ticket Created</p>
+                             <p className="text-xs text-gray-500 mt-1">by John Doe</p>
+                             <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1"><Clock size={10}/> 28 Feb 2025 - 10:39 PM</p>
+                         </div>
+                         <div className="relative">
+                             <div className="absolute -left-[21px] bg-purple-100 p-1 rounded-full text-purple-600 border border-white shadow-sm">
+                                 <Edit2 size={10} />
+                             </div>
+                             <p className="text-xs font-bold text-gray-800">Assigned to Mike Ross</p>
+                             <p className="text-xs text-gray-500 mt-1">by System Automated Rule</p>
+                             <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1"><Clock size={10}/> 28 Feb 2025 - 10:45 PM</p>
                          </div>
                      </div>
                  </div>
-             </div>
-         </div>
+             )}
 
-         {/* Ticket Details Card */}
-         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-             <div className="flex justify-between items-center mb-4 cursor-pointer">
-                 <h3 className="font-bold text-gray-900 text-sm">Ticket Details</h3>
-                 <ChevronDown size={14} className="text-gray-400" />
-             </div>
-             
-             <div className="space-y-4">
-                 <div>
-                     <div className="flex items-center gap-1 text-gray-400 mb-1">
-                         <Info size={12} />
-                         <span className="text-xs">Ticket ID</span>
-                     </div>
-                     <p className="text-sm font-bold text-gray-800">Case-1</p>
-                 </div>
-
-                 <div>
-                     <label className="text-xs text-gray-500 block mb-1">Urgency</label>
-                     <select className="w-full text-xs border border-gray-200 rounded p-1.5 bg-gray-50 focus:outline-none">
-                         <option>Urgent</option>
-                         <option>High</option>
-                         <option>Medium</option>
-                         <option>Low</option>
-                     </select>
-                 </div>
-
-                 <div>
-                     <div className="flex items-center gap-1 text-gray-400 mb-1">
-                         <RotateCcw size={12} />
-                         <span className="text-xs">Created Date</span>
-                     </div>
-                     <p className="text-sm font-bold text-gray-800">28 Feb 2025 - 10:40 PM</p>
-                 </div>
-
-                 {/* SLA Details */}
-                 <div className="pt-2 border-t border-gray-100 space-y-3">
-                     <div>
-                         <p className="text-xs font-bold text-gray-800">Standard SLA Response:</p>
-                         <p className="text-xs text-gray-500">3 hours</p>
-                     </div>
-                     <div>
-                         <p className="text-xs font-bold text-gray-800">Standard SLA Resolve:</p>
-                         <p className="text-xs text-gray-500">12 hours</p>
-                     </div>
-                     
-                     <div>
-                         <p className="text-xs font-bold text-gray-800">First Response Due Estimation:</p>
-                         <div className="flex items-center gap-2">
-                             <span className="text-xs text-gray-600">02 Dec 2025 15:30</span>
-                             <span className="text-[10px] bg-green-100 text-green-600 font-bold px-1.5 rounded">Within SLA</span>
+             {/* ATTACHMENTS VIEW */}
+             {activeTab === 'attachments' && (
+                 <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 animate-in fade-in slide-in-from-right-2 duration-300">
+                     <h3 className="font-bold text-gray-900 text-sm mb-4 flex items-center gap-2">
+                         <Paperclip size={16} /> Attachments (2)
+                     </h3>
+                     <div className="space-y-3">
+                         <div className="flex items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors group">
+                             <div className="w-8 h-8 bg-red-50 text-red-500 rounded flex items-center justify-center mr-3">
+                                 <Image size={16} />
+                             </div>
+                             <div className="flex-1 min-w-0">
+                                 <p className="text-xs font-bold text-gray-700 truncate">screenshot_error_sap.png</p>
+                                 <p className="text-[10px] text-gray-400">2.4 MB</p>
+                             </div>
+                             <button className="text-gray-400 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                 <Download size={14} />
+                             </button>
+                         </div>
+                         <div className="flex items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors group">
+                             <div className="w-8 h-8 bg-blue-50 text-blue-500 rounded flex items-center justify-center mr-3">
+                                 <FileText size={16} />
+                             </div>
+                             <div className="flex-1 min-w-0">
+                                 <p className="text-xs font-bold text-gray-700 truncate">system_logs.txt</p>
+                                 <p className="text-[10px] text-gray-400">15 KB</p>
+                             </div>
+                             <button className="text-gray-400 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                 <Download size={14} />
+                             </button>
                          </div>
                      </div>
-                     <div>
-                         <p className="text-xs font-bold text-gray-800">Till First Response Due Estimation:</p>
-                         <p className="text-xs font-bold text-teal-400">+0 day 2 hours 29 minutes</p>
-                     </div>
+                     <button className="w-full mt-4 border border-dashed border-gray-300 rounded-lg py-3 text-xs text-gray-500 hover:bg-gray-50 hover:border-indigo-300 transition-colors flex items-center justify-center gap-2">
+                         <Plus size={14} /> Upload new file
+                     </button>
+                 </div>
+             )}
 
-                     <div>
-                         <p className="text-xs font-bold text-gray-800">Resolve Due Estimation:</p>
-                         <div className="flex items-center gap-2">
-                             <span className="text-xs text-gray-600">08 Dec 2025 11:43</span>
-                             <span className="text-[10px] bg-green-100 text-green-600 font-bold px-1.5 rounded">Within SLA</span>
-                         </div>
-                     </div>
-                     <div>
-                         <p className="text-xs font-bold text-gray-800">Till Resolve Due Estimation:</p>
-                         <p className="text-xs font-bold text-teal-400">+0 day 12 hours 0 minutes</p>
-                     </div>
-                     
-                     <div>
-                         <p className="text-xs font-bold text-gray-800">2nd Layer Resolution Timer:</p>
-                         <p className="text-xs text-gray-500">0 Minutes</p>
-                     </div>
-                 </div>
-
-                 <div>
-                     <div className="flex items-center gap-1 text-gray-400 mb-1">
-                         <MessageCircle size={12} />
-                         <span className="text-xs">Rating</span>
-                     </div>
-                     <div className="flex text-yellow-400 text-xs">★★★★☆</div>
-                 </div>
-
-                 <div className="bg-orange-50 border border-orange-100 p-3 rounded-lg text-xs text-orange-600 leading-relaxed">
-                     I appreciate the prompt response and acknowledgment of my feedback. It's reassuring
-                     <span className="block font-bold underline cursor-pointer mt-1">Show more</span>
-                 </div>
-             </div>
-         </div>
-
-         {/* Trello Card Details (Renamed) */}
-         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-             <div className="flex justify-between items-center mb-4">
-                 <h3 className="font-bold text-gray-900 text-sm">Trello Card Details</h3>
-             </div>
-             
-             <div className="space-y-3">
-                 <div>
-                     <label className="text-xs text-gray-500 block mb-1">Impact</label>
-                     <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">Low</div>
-                 </div>
-                 
-                 <div>
-                     <label className="text-xs text-gray-500 block mb-1">Tagging</label>
-                     <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">#SAP</div>
-                 </div>
-
-                 <div>
-                     <label className="text-xs text-gray-500 block mb-1">Agent Group</label>
-                     <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">Service Desk</div>
-                 </div>
-                 
-                 <div>
-                     <label className="text-xs text-gray-500 block mb-1">Priority</label>
-                     <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">High</div>
-                 </div>
-             </div>
          </div>
 
       </div>

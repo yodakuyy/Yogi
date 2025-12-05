@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { LoginForm } from './components/LoginForm';
-import { ShowcasePanel } from './components/ShowcasePanel';
 import { ServiceSelection } from './components/ServiceSelection';
 import { Dashboard } from './components/Dashboard';
+import { ChatbotVisual } from './components/ChatbotVisual';
 
 const App: React.FC = () => {
   const [view, setView] = useState<'login' | 'services' | 'dashboard'>('login');
@@ -43,8 +44,29 @@ const App: React.FC = () => {
       </div>
 
       {/* Right Side - Visuals */}
-      <div className="hidden lg:flex w-1/2 bg-[#3b2cb8] relative items-center justify-center overflow-hidden">
-        <ShowcasePanel />
+      <div className={`hidden lg:flex w-1/2 relative items-center justify-center overflow-hidden ${view === 'login' ? 'bg-gray-900' : 'bg-[#F0F4FF]'}`}>
+        {view === 'login' ? (
+          /* Login View Visual: Modena Office */
+          <>
+            <img 
+              src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80" 
+              alt="Office Background" 
+              className="absolute inset-0 w-full h-full object-cover opacity-60"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30"></div>
+            
+            <div className="relative z-10 text-center p-8 animate-in fade-in duration-1000">
+              <h1 className="text-5xl font-bold text-white tracking-tight mb-2">
+                MODENA <span className="font-light">Servicedesk</span>
+              </h1>
+            </div>
+          </>
+        ) : (
+          /* Services View Visual: Zay-G Chatbot Interface */
+          <div className="w-full h-full animate-in fade-in duration-500">
+            <ChatbotVisual />
+          </div>
+        )}
       </div>
     </div>
   );

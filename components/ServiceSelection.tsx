@@ -44,9 +44,9 @@ export const ServiceSelection: React.FC<ServiceSelectionProps> = ({ onSelect }) 
         <div className="mx-auto w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg mb-4">
             <Zap size={20} fill="currentColor" />
         </div>
-        <h1 className="text-3xl font-bold text-gray-900">Select a Service</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Select a Department</h1>
         <p className="text-gray-500 text-sm max-w-xs mx-auto">
-          Choose the department that suits you and your business best.
+          Choose a department to submit your ticket.
         </p>
       </div>
 
