@@ -45,7 +45,8 @@ import {
   Calendar,
   LayoutGrid,
   Folder,
-  Share2
+  Share2,
+  Eye
 } from 'lucide-react';
 
 const tickets = [
@@ -74,6 +75,11 @@ const oneDriveFiles = [
     { name: 'Monthly_Network Connection Uptime_raw data', type: 'excel', opened: 'Wed at 10:49 AM', owner: 'Oca Rosnalita', activity: '' },
     { name: 'Pre Kickoff Meeting - Service Desk - Copy', type: 'ppt', opened: 'Wed at 7:56 AM', owner: 'Yogi Danis Fermana', activity: '' },
     { name: 'AI Servicedesk', type: 'ppt', opened: 'Wed at 7:56 AM', owner: 'Yogi Danis Fermana', activity: '' },
+];
+
+const attachmentsList = [
+    { name: "screenshot_error_sap.png", size: "2.4 MB", type: "image" },
+    { name: "system_logs.txt", size: "15 KB", type: "text" }
 ];
 
 export const IncidentList: React.FC = () => {
@@ -277,6 +283,14 @@ export const IncidentList: React.FC = () => {
           setShowOneDriveModal(false);
           setSelectedCloudFile(null);
       }
+  };
+
+  const handleViewAttachment = (fileName: string) => {
+      alert(`Viewing file: ${fileName}`);
+  };
+
+  const handleDownloadAttachment = (fileName: string) => {
+      alert(`Downloading file: ${fileName}`);
   };
 
   // Filter email options based on search
@@ -1249,30 +1263,38 @@ export const IncidentList: React.FC = () => {
                          <Paperclip size={16} /> Attachments (2)
                      </h3>
                      <div className="space-y-3">
-                         <div className="flex items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors group">
-                             <div className="w-8 h-8 bg-red-50 text-red-500 rounded flex items-center justify-center mr-3">
-                                 <Image size={16} />
+                        {attachmentsList.map((file, idx) => (
+                             <div key={idx} className="flex items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors group relative">
+                                 <div className={`w-8 h-8 rounded flex items-center justify-center mr-3 ${file.type === 'image' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}`}>
+                                     {file.type === 'image' ? <Image size={16} /> : <FileText size={16} />}
+                                 </div>
+                                 <div 
+                                    className="flex-1 min-w-0 cursor-pointer"
+                                    onClick={() => handleViewAttachment(file.name)}
+                                    title="Click to view"
+                                 >
+                                     <p className="text-xs font-bold text-gray-700 truncate hover:text-indigo-600 hover:underline transition-all">{file.name}</p>
+                                     <p className="text-[10px] text-gray-400">{file.size}</p>
+                                 </div>
+                                 
+                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                     <button 
+                                        onClick={() => handleViewAttachment(file.name)}
+                                        className="text-gray-400 hover:text-indigo-600 p-1.5 rounded hover:bg-white hover:shadow-sm transition-all"
+                                        title="View"
+                                     >
+                                         <Eye size={14} />
+                                     </button>
+                                     <button 
+                                        onClick={() => handleDownloadAttachment(file.name)}
+                                        className="text-gray-400 hover:text-indigo-600 p-1.5 rounded hover:bg-white hover:shadow-sm transition-all"
+                                        title="Download"
+                                     >
+                                         <Download size={14} />
+                                     </button>
+                                 </div>
                              </div>
-                             <div className="flex-1 min-w-0">
-                                 <p className="text-xs font-bold text-gray-700 truncate">screenshot_error_sap.png</p>
-                                 <p className="text-[10px] text-gray-400">2.4 MB</p>
-                             </div>
-                             <button className="text-gray-400 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                                 <Download size={14} />
-                             </button>
-                         </div>
-                         <div className="flex items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors group">
-                             <div className="w-8 h-8 bg-blue-50 text-blue-500 rounded flex items-center justify-center mr-3">
-                                 <FileText size={16} />
-                             </div>
-                             <div className="flex-1 min-w-0">
-                                 <p className="text-xs font-bold text-gray-700 truncate">system_logs.txt</p>
-                                 <p className="text-[10px] text-gray-400">15 KB</p>
-                             </div>
-                             <button className="text-gray-400 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                                 <Download size={14} />
-                             </button>
-                         </div>
+                        ))}
                      </div>
                      <button className="w-full mt-4 border border-dashed border-gray-300 rounded-lg py-3 text-xs text-gray-500 hover:bg-gray-50 hover:border-indigo-300 transition-colors flex items-center justify-center gap-2">
                          <Plus size={14} /> Upload new file

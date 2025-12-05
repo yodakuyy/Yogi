@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 import { IncidentList } from './IncidentList';
+import { KnowledgeBase } from './KnowledgeBase';
 
 const inventoryData = [
   { name: 'Desktops', count: 60 },
@@ -38,7 +39,7 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onChangeDepartment }) => {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'incidents'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'incidents' | 'knowledge-base'>('dashboard');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -88,7 +89,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onChangeDepartme
           
           <NavItem icon={<Briefcase size={18} />} label="Out Of Office" />
 
-          <NavItem icon={<BookOpen size={18} />} label="Knowledge Base" />
+          <NavItem 
+            icon={<BookOpen size={18} />} 
+            label="Knowledge Base" 
+            active={currentView === 'knowledge-base'}
+            onClick={() => setCurrentView('knowledge-base')}
+          />
           
           {/* Collapsible Settings */}
           <div>
@@ -187,11 +193,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onChangeDepartme
           </button>
         )}
 
-        {currentView === 'dashboard' ? (
-          <DashboardContent />
-        ) : (
-          <IncidentList />
-        )}
+        {currentView === 'dashboard' && <DashboardContent />}
+        {currentView === 'incidents' && <IncidentList />}
+        {currentView === 'knowledge-base' && <KnowledgeBase />}
       </main>
 
       {/* Chatbot Floating Button */}
