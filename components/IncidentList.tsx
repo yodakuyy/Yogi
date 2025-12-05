@@ -34,7 +34,9 @@ import {
   List as ListIcon,
   ListOrdered,
   Type,
-  Check
+  Check,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
 
 const tickets = [
@@ -77,6 +79,9 @@ export const IncidentList: React.FC = () => {
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [showEmailDropdown, setShowEmailDropdown] = useState(false);
   const [emailSearch, setEmailSearch] = useState('');
+
+  // Chat Zoom State
+  const [isChatZoomed, setIsChatZoomed] = useState(false);
   
   const emailOptions = [
     "jane.walker@modena.com",
@@ -502,14 +507,13 @@ export const IncidentList: React.FC = () => {
       </div>
 
       {/* Middle Column Container */}
-      <div className="flex-1 flex flex-col gap-4 overflow-hidden min-w-0">
+      <div className={`flex-1 flex flex-col gap-4 overflow-hidden min-w-0 ${isChatZoomed ? 'z-50' : ''}`}>
         
         {/* Chat Interface (Combined with Description) */}
-        <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden relative">
+        <div className={isChatZoomed ? "fixed inset-0 z-50 bg-white flex flex-col animate-in fade-in zoom-in-95 duration-200" : "flex-1 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden relative"}>
             {/* Header */}
             <div className="p-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
                 <div className="flex items-center gap-3">
-                    <button className="p-1 text-gray-400 hover:bg-gray-50 rounded transition-colors"><span className="text-lg">×</span></button>
                     <div className="flex items-center gap-2">
                         <button className="text-gray-400 hover:bg-gray-50 p-1 rounded transition-colors"><ChevronDown size={14} /></button>
                         <h2 className="font-bold text-gray-800">Case-1</h2>
@@ -549,6 +553,15 @@ export const IncidentList: React.FC = () => {
                         className="text-xs font-medium text-cyan-600 bg-cyan-50 border border-cyan-100 px-3 py-1.5 rounded hover:bg-cyan-100 flex items-center gap-1 transition-colors"
                     >
                         <ArrowUpCircle size={14} /> Escalate
+                    </button>
+
+                    <button 
+                        onClick={() => setIsChatZoomed(!isChatZoomed)}
+                        className={`text-xs font-medium border px-3 py-1.5 rounded flex items-center gap-1 transition-colors ${isChatZoomed ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 'text-gray-600 bg-gray-50 border-gray-200 hover:bg-gray-100'}`}
+                        title={isChatZoomed ? "Close Zoom" : "Zoom Chat"}
+                    >
+                        {isChatZoomed ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                        {isChatZoomed && <span>Close Zoom</span>}
                     </button>
                 </div>
             </div>
