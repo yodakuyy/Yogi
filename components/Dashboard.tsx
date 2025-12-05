@@ -24,6 +24,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 import { IncidentList } from './IncidentList';
 import { KnowledgeBase } from './KnowledgeBase';
+import { OutOfOffice } from './OutOfOffice';
 
 const inventoryData = [
   { name: 'Desktops', count: 60 },
@@ -39,7 +40,7 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onChangeDepartment }) => {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'incidents' | 'knowledge-base'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'incidents' | 'knowledge-base' | 'out-of-office'>('dashboard');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -87,7 +88,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onChangeDepartme
           />
           <NavItem icon={<Package size={18} />} label="Service Request" />
           
-          <NavItem icon={<Briefcase size={18} />} label="Out Of Office" />
+          <NavItem 
+            icon={<Briefcase size={18} />} 
+            label="Out Of Office" 
+            active={currentView === 'out-of-office'}
+            onClick={() => setCurrentView('out-of-office')}
+          />
 
           <NavItem 
             icon={<BookOpen size={18} />} 
@@ -196,6 +202,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onChangeDepartme
         {currentView === 'dashboard' && <DashboardContent />}
         {currentView === 'incidents' && <IncidentList />}
         {currentView === 'knowledge-base' && <KnowledgeBase />}
+        {currentView === 'out-of-office' && <OutOfOffice />}
       </main>
 
       {/* Chatbot Floating Button */}

@@ -13,7 +13,7 @@ interface Category {
 
 const categories: Category[] = [
   { id: 1, title: 'Sign Up', description: 'Description of signup process of acquire.io', articles: 12, questions: 6 },
-  { id: 2, title: 'Getting Started', description: 'Answers & articles related to getting started.', articles: 2, questions: 0, active: true },
+  { id: 2, title: 'Getting Started', description: 'Answers & articles related to getting started.', articles: 2, questions: 0 },
   { id: 3, title: 'How to setup triggers', description: 'Articles & Questions related to triggers & campaigns', articles: 12, questions: 6 },
   { id: 4, title: 'Dashboard', description: 'Triggers articles & videos', articles: 12, questions: 6 },
   { id: 5, title: 'Billing, packages and Upgrade', description: 'Information related to Invoices & billings', articles: 9, questions: 12 },
@@ -46,8 +46,8 @@ export const KnowledgeBase: React.FC = () => {
             <div 
               key={cat.id} 
               className={`
-                bg-white p-6 rounded-xl border transition-all duration-200 cursor-pointer group relative flex flex-col justify-between min-h-[180px]
-                ${cat.active ? 'border-blue-400 ring-2 ring-blue-100 shadow-lg scale-[1.02]' : 'border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 hover:-translate-y-1'}
+                bg-white p-6 rounded-xl border border-gray-100 shadow-sm transition-all duration-200 cursor-pointer group relative flex flex-col justify-between min-h-[180px]
+                hover:shadow-lg hover:border-blue-400 hover:ring-2 hover:ring-blue-100 hover:-translate-y-1 hover:scale-[1.02]
               `}
             >
                <div className="absolute top-4 right-4 text-gray-300 group-hover:text-gray-500 transition-colors p-1 hover:bg-gray-50 rounded">

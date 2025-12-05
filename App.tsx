@@ -33,8 +33,8 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen w-full flex bg-white overflow-hidden">
       {/* Left Side - Form Area */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 sm:p-12 lg:p-24 overflow-y-auto relative transition-all duration-500">
-        <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className={`w-full lg:w-1/2 flex flex-col justify-center items-center overflow-y-auto relative transition-all duration-500 ${view === 'services' ? 'p-4 sm:p-6 lg:p-8' : 'p-6 sm:p-12 lg:p-24'}`}>
+        <div className={`w-full animate-in fade-in slide-in-from-bottom-4 duration-700 ${view === 'services' ? 'max-w-4xl' : 'max-w-md'}`}>
            {view === 'login' ? (
              <LoginForm onLoginSuccess={handleLoginSuccess} />
            ) : (
