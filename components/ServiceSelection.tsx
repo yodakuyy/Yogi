@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Check, ArrowRight, Zap } from 'lucide-react';
 
@@ -12,10 +13,9 @@ const services = [
     features: ['Network Security', 'Hardware Support', 'Cloud Integration']
   },
   { 
-    name: 'Creative', 
+    name: 'CREATIVE', 
     description: 'Design & Branding', 
-    features: ['Brand Identity', 'UI/UX Design', 'Motion Graphics'],
-    recommended: true
+    features: ['Brand Identity', 'UI/UX Design', 'Motion Graphics']
   },
   { 
     name: 'HCO', 
@@ -23,7 +23,7 @@ const services = [
     features: ['Talent Acquisition', 'Employee Relations', 'Payroll Systems'] 
   },
   { 
-    name: 'Legal', 
+    name: 'LEGAL', 
     description: 'Compliance & Law',
     features: ['Contract Review', 'Risk Assessment', 'Regulatory Filing'] 
   },
@@ -36,7 +36,7 @@ const services = [
 
 export const ServiceSelection: React.FC<ServiceSelectionProps> = ({ onSelect }) => {
   return (
-    <div className="flex flex-col space-y-8 animate-in slide-in-from-right-8 duration-500">
+    <div className="flex flex-col space-y-8 animate-in slide-in-from-right-8 duration-500 w-full max-w-2xl mx-auto">
       
       {/* Header */}
       <div className="text-center space-y-2">
@@ -50,51 +50,45 @@ export const ServiceSelection: React.FC<ServiceSelectionProps> = ({ onSelect }) 
         </p>
       </div>
 
-      {/* Cards Container - Vertical Stack for the side panel */}
-      <div className="flex flex-col space-y-4 pb-8">
-        {services.map((service) => (
+      {/* Cards Container - Grid Layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-8">
+        {services.map((service, index) => (
           <div 
             key={service.name}
             className={`
-              relative group rounded-2xl p-6 transition-all duration-300
-              ${service.recommended 
-                ? 'bg-[#1e1b4b] text-white shadow-xl scale-105 border-transparent' 
-                : 'bg-white text-gray-800 border border-gray-100 shadow-md hover:shadow-xl hover:border-indigo-100 hover:-translate-y-1'
-              }
+              relative group rounded-2xl p-6 transition-all duration-300 cursor-pointer
+              bg-white text-gray-800 border border-gray-100 shadow-md 
+              hover:shadow-xl hover:bg-[#1e1b4b] hover:border-transparent hover:-translate-y-1 hover:scale-[1.02]
+              ${index === services.length - 1 ? 'sm:col-span-2 sm:w-1/2 sm:mx-auto' : ''}
             `}
+            onClick={() => onSelect(service.name)}
           >
-            {service.recommended && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
-                Recommended
-              </div>
-            )}
-
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className={`text-xl font-bold ${service.recommended ? 'text-white' : 'text-gray-900'}`}>
+                <h3 className="text-xl font-bold text-gray-900 group-hover:text-white transition-colors">
                   {service.name}
                 </h3>
-                <p className={`text-xs ${service.recommended ? 'text-indigo-200' : 'text-gray-500'} mt-1`}>
+                <p className="text-xs text-gray-500 mt-1 group-hover:text-indigo-200 transition-colors">
                   {service.description}
                 </p>
               </div>
-              {/* Fake Pricing-like visual */}
-              <div className={`text-right ${service.recommended ? 'opacity-80' : 'opacity-40'}`}>
+              {/* Icon */}
+              <div className="text-right opacity-40 group-hover:opacity-80 group-hover:text-white transition-opacity">
                  <Zap className="w-5 h-5" />
               </div>
             </div>
 
             {/* Divider */}
-            <div className={`h-px w-full my-4 ${service.recommended ? 'bg-indigo-800' : 'bg-gray-100'}`}></div>
+            <div className="h-px w-full my-4 bg-gray-100 group-hover:bg-indigo-800 transition-colors"></div>
 
             {/* Features List */}
             <ul className="space-y-2 mb-6">
               {service.features.map((feature, idx) => (
                 <li key={idx} className="flex items-center text-xs font-medium">
-                  <span className={`mr-2 flex items-center justify-center w-4 h-4 rounded-full ${service.recommended ? 'bg-indigo-500/30 text-green-300' : 'bg-green-100 text-green-600'}`}>
+                  <span className="mr-2 flex items-center justify-center w-4 h-4 rounded-full bg-green-100 text-green-600 group-hover:bg-indigo-500/30 group-hover:text-green-300 transition-colors">
                      <Check size={10} strokeWidth={4} />
                   </span>
-                  <span className={service.recommended ? 'text-indigo-100' : 'text-gray-600'}>
+                  <span className="text-gray-600 group-hover:text-indigo-100 transition-colors">
                     {feature}
                   </span>
                 </li>
@@ -102,14 +96,7 @@ export const ServiceSelection: React.FC<ServiceSelectionProps> = ({ onSelect }) 
             </ul>
 
             <button
-              onClick={() => onSelect(service.name)}
-              className={`
-                w-full py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center transition-colors
-                ${service.recommended 
-                  ? 'bg-blue-500 hover:bg-blue-400 text-white' 
-                  : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700'
-                }
-              `}
+              className="w-full py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center transition-colors bg-indigo-50 text-indigo-700 group-hover:bg-blue-500 group-hover:text-white"
             >
               <span>Get Started</span>
               <ArrowRight size={16} className="ml-2" />

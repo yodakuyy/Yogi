@@ -51,6 +51,12 @@ export const IncidentList: React.FC = () => {
     requester: ''
   });
 
+  // State for Ticket Detail Status Workflow
+  const [ticketDetailStatus, setTicketDetailStatus] = useState('OPEN');
+  const [ticketDetailSlaStatus, setTicketDetailSlaStatus] = useState('Running');
+  const [showPendingModal, setShowPendingModal] = useState(false);
+  const [pendingRemark, setPendingRemark] = useState('');
+
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -89,9 +95,67 @@ export const IncidentList: React.FC = () => {
     }
   };
 
+  const handlePendingClick = () => {
+    setShowActionMenu(false);
+    setShowPendingModal(true);
+  };
+
+  const handleSubmitPending = () => {
+    if (!pendingRemark.trim()) {
+        alert("Please enter a remark.");
+        return;
+    }
+    setTicketDetailStatus('PENDING');
+    setTicketDetailSlaStatus('Stopped');
+    setShowPendingModal(false);
+    setPendingRemark('');
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+        case 'OPEN': return 'text-green-600 bg-green-100';
+        case 'PENDING': return 'text-orange-600 bg-orange-100';
+        case 'CLOSED': return 'text-gray-500 bg-gray-100';
+        default: return 'text-gray-500 bg-gray-100';
+    }
+  };
+
   return (
-    <div className="flex h-[calc(100vh-6rem)] gap-4 overflow-hidden">
+    <div className="flex h-[calc(100vh-6rem)] gap-4 overflow-hidden relative">
       
+      {/* Pending Modal Overlay */}
+      {showPendingModal && (
+        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center animate-in fade-in duration-200">
+            <div className="bg-white rounded-lg shadow-2xl w-[400px] p-6 animate-in zoom-in-95 duration-200">
+                <h3 className="text-xl font-bold text-gray-800 text-center mb-6 leading-tight">
+                    Please enter a remark/message about the pending status
+                </h3>
+                
+                <textarea 
+                    value={pendingRemark}
+                    onChange={(e) => setPendingRemark(e.target.value)}
+                    placeholder="Put remark here"
+                    className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm mb-6"
+                ></textarea>
+
+                <div className="flex justify-center gap-4">
+                    <button 
+                        onClick={handleSubmitPending}
+                        className="bg-[#4338CA] hover:bg-[#3730A3] text-white font-medium py-2 px-8 rounded-lg transition-colors"
+                    >
+                        Submit
+                    </button>
+                    <button 
+                        onClick={() => { setShowPendingModal(false); setPendingRemark(''); }}
+                        className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-8 rounded-lg transition-colors"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
+
       {/* Left Column: Ticket List */}
       <div className="w-1/3 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden relative">
         
@@ -277,7 +341,9 @@ export const IncidentList: React.FC = () => {
                     <div className="flex items-center gap-2">
                         <button className="text-gray-400 hover:bg-gray-50 p-1 rounded transition-colors"><ChevronDown size={14} /></button>
                         <h2 className="font-bold text-gray-800">Case-1</h2>
-                        <span className="text-[10px] font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded uppercase">Open</span>
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${getStatusColor(ticketDetailStatus)}`}>
+                            {ticketDetailStatus}
+                        </span>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 relative">
@@ -293,7 +359,10 @@ export const IncidentList: React.FC = () => {
                         
                         {showActionMenu && (
                             <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-100 shadow-lg rounded-lg z-20 py-1 animate-in fade-in zoom-in-95 duration-200">
-                                <button className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium transition-colors">
+                                <button 
+                                    onClick={handlePendingClick}
+                                    className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium transition-colors"
+                                >
                                     Pending
                                 </button>
                                 <button className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium transition-colors">
@@ -360,9 +429,9 @@ export const IncidentList: React.FC = () => {
                     </div>
                     <div className="bg-white text-gray-800 p-4 rounded-r-xl rounded-bl-xl shadow-sm border border-gray-100 text-sm leading-relaxed">
                         The user interface, while functional, was somewhat confusing in certain areas, making it challenging to navigate and use effectively. This lack of clarity could potentially hinder users from fully utilizing the platform's features. Additionally, the presence of several spelling and grammar mistakes throughout the system further impacts the overall user experience, as it may reduce the perceived professionalism and reliability...
-                        <div className="mt-1 text-indigo-600 text-xs font-semibold cursor-pointer underline">Read More</div>
+                        <div className="mt-1 text-indigo-600 text-xs font-bold cursor-pointer hover:underline">Read More</div>
                     </div>
-                    <div className="mt-1 flex items-center justify-start gap-3 text-[10px] text-gray-400">
+                    <div className="mt-1 flex items-center justify-end gap-3 text-[10px] text-gray-400">
                         <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
                         <span>28 Feb 2025 - 12:40 PM</span>
                     </div>
@@ -371,260 +440,248 @@ export const IncidentList: React.FC = () => {
 
                 {/* Agent Message */}
                 <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e1b4b] flex items-center justify-center text-white text-xs font-bold shadow-sm">A</div>
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold text-gray-800">Agent</span>
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e1b4b] flex items-center justify-center text-white text-xs font-bold shadow-sm">A</div>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-bold text-gray-800">Agent</span>
+                        </div>
+                        <div className="bg-[#1e1b4b] text-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-sm leading-relaxed">
+                            Thank you for your feedback. We're working to improve the interface for better clarity and usability while also addressing any language errors. Your insights are invaluable, and we appreciate your help in making the platform better. Best regards,
+                        </div>
+                        <div className="mt-1 flex items-center justify-end gap-3 text-[10px] text-gray-400">
+                            <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
+                            <span>28 Feb 2025 - 10:45 PM</span>
+                        </div>
                     </div>
-                    <div className="bg-[#1e1b4b] text-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-sm leading-relaxed">
-                        Thank you for your feedback. We're working to improve the interface for better clarity and usability while also addressing any language errors. Your insights are invaluable, and we appreciate your help in making the platform better.
-                        <br/>Best regards,
-                    </div>
-                    <div className="mt-1 flex items-center justify-end gap-3 text-[10px] text-gray-400">
-                        <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
-                        <span>28 Feb 2025 - 10:45 PM</span>
-                    </div>
-                </div>
                 </div>
 
-                {/* Agent Message 2 */}
+                 {/* Agent Message 2 */}
                 <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e1b4b] flex items-center justify-center text-white text-xs font-bold shadow-sm">A</div>
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold text-gray-800">Agent</span>
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e1b4b] flex items-center justify-center text-white text-xs font-bold shadow-sm">A</div>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-bold text-gray-800">Agent</span>
+                        </div>
+                        <div className="bg-[#1e1b4b] text-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-sm leading-relaxed">
+                            Hello again,
+                            <br/><br/>
+                            We've made some updates based on your feedback. Could you please check and let us know if everything looks good on your end? Your input helps us refine the experience further.
+                            Best regards,
+                        </div>
+                        <div className="mt-1 flex items-center justify-end gap-3 text-[10px] text-gray-400">
+                            <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
+                            <span>28 Feb 2025 - 10:45 PM</span>
+                        </div>
                     </div>
-                    <div className="bg-[#1e1b4b] text-white p-4 rounded-r-xl rounded-bl-xl shadow-sm text-sm leading-relaxed">
-                        Hello again,
-                        <br/><br/>
-                        We've made some updates based on your feedback. Could you please check and let us know if everything looks good on your end? Your input helps us refine the experience further.
-                        <br/>Best regards,
-                    </div>
-                    <div className="mt-1 flex items-center justify-end gap-3 text-[10px] text-gray-400">
-                        <span className="flex items-center gap-1"><BookOpen size={10} /> Read</span>
-                        <span>28 Feb 2025 - 10:45 PM</span>
-                    </div>
-                </div>
                 </div>
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-white border-t border-gray-100 flex-shrink-0">
-                <div className="flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-4 py-2 hover:border-indigo-200 transition-colors focus-within:border-indigo-400 focus-within:ring-1 focus-within:ring-indigo-100">
-                    <input 
-                    type="text" 
-                    placeholder="Start Typing..." 
-                    className="flex-1 bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-400"
-                    />
-                    <button className="text-gray-400 hover:text-gray-600 transition-colors"><Paperclip size={18} /></button>
-                    <button className="text-gray-400 hover:text-gray-600 transition-colors"><Smile size={18} /></button>
-                    <button className="bg-cyan-500 hover:bg-cyan-600 text-white p-1.5 rounded-md transition-colors shadow-sm">
-                        <Send size={16} className="ml-0.5" />
+            <div className="p-4 bg-white border-t border-gray-100">
+                 <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-xl border border-gray-100">
+                    <input type="text" placeholder="Start Typing..." className="flex-1 bg-transparent border-none focus:ring-0 text-sm px-2 outline-none" />
+                    <button className="text-gray-400 hover:text-gray-600"><Paperclip size={18} /></button>
+                    <button className="text-gray-400 hover:text-gray-600"><Smile size={18} /></button>
+                    <button className="bg-cyan-500 hover:bg-cyan-600 text-white p-2 rounded-lg shadow-sm transition-colors">
+                        <Send size={16} />
                     </button>
-                </div>
+                 </div>
             </div>
         </div>
-
       </div>
 
-      {/* Right Column: Details */}
-      <div className="w-1/4 flex flex-col gap-4 overflow-y-auto pr-1 pb-4">
-          
-          {/* Contact Details Card */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-              <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-sm font-bold text-gray-800">Contact Details</h3>
-                  <ChevronDown size={14} className="text-gray-400 cursor-pointer" />
-              </div>
-              
-              <div className="space-y-4">
-                  {/* Requester */}
-                  <div>
-                      <div className="text-xs font-semibold text-gray-500 mb-2">Requester</div>
-                      <div className="flex items-center justify-between group cursor-pointer p-1 -mx-1 rounded hover:bg-gray-50">
-                          <div className="flex items-center gap-2">
-                              <img src="https://i.pravatar.cc/150?u=john" className="w-8 h-8 rounded-full border border-gray-100" alt="John" />
-                              <div className="overflow-hidden">
-                                  <div className="text-xs font-bold text-gray-800">John Doe</div>
-                                  <div className="text-[10px] text-gray-400 truncate">johndoe@gmail.com</div>
-                              </div>
-                          </div>
-                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button className="p-1 bg-white border border-gray-200 rounded text-gray-400 hover:text-indigo-600"><ExternalLink size={10} /></button>
-                          </div>
-                      </div>
-                  </div>
-
-                  {/* Requested For */}
-                  <div>
-                      <div className="text-xs font-semibold text-gray-500 mb-2">Requested For</div>
-                      <div className="flex items-center justify-between group cursor-pointer p-1 -mx-1 rounded hover:bg-gray-50">
-                          <div className="flex items-center gap-2">
-                              <img src="https://i.pravatar.cc/150?u=john" className="w-8 h-8 rounded-full border border-gray-100" alt="John" />
-                              <div className="overflow-hidden">
-                                  <div className="text-xs font-bold text-gray-800">John Doe</div>
-                                  <div className="text-[10px] text-gray-400 truncate">johndoe@gmail.com</div>
-                              </div>
-                          </div>
-                           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button className="p-1 bg-white border border-gray-200 rounded text-gray-400 hover:text-indigo-600"><Edit2 size={10} /></button>
-                          </div>
-                      </div>
-                  </div>
-
-                  {/* Agent */}
-                  <div>
-                      <div className="text-xs font-semibold text-gray-500 mb-2">Agent</div>
-                      <div className="flex items-center justify-between group cursor-pointer p-1 -mx-1 rounded hover:bg-gray-50">
-                          <div className="flex items-center gap-2">
-                              <img src="https://i.pravatar.cc/150?u=mike" className="w-8 h-8 rounded-full border border-gray-100" alt="Mike" />
-                              <div className="overflow-hidden">
-                                  <div className="text-xs font-bold text-gray-800">Mike Ross</div>
-                                  <div className="text-[10px] text-gray-400 truncate">mikeross@modena.com</div>
-                              </div>
-                          </div>
-                           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button className="p-1 bg-white border border-gray-200 rounded text-gray-400 hover:text-indigo-600"><Edit2 size={10} /></button>
-                          </div>
-                      </div>
-                  </div>
-
-                  {/* Second Layer Agent */}
-                  <div>
-                      <div className="text-xs font-semibold text-gray-500 mb-2">Second Layer Agent</div>
-                      <div className="space-y-2">
-                          <div className="flex items-center justify-between group cursor-pointer p-1 -mx-1 rounded hover:bg-gray-50">
-                              <div className="flex items-center gap-2">
-                                  <img src="https://i.pravatar.cc/150?u=jane" className="w-6 h-6 rounded-full border border-gray-100" alt="Jane" />
-                                  <div>
-                                      <div className="text-xs font-bold text-gray-800">Jane Walker</div>
-                                      <div className="text-[10px] text-gray-400">Network Specialist</div>
-                                  </div>
-                              </div>
-                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <button className="p-1 bg-white border border-gray-200 rounded text-gray-400 hover:text-indigo-600"><Edit2 size={10} /></button>
-                              </div>
-                          </div>
-                          <div className="flex items-center justify-between group cursor-pointer p-1 -mx-1 rounded hover:bg-gray-50">
-                              <div className="flex items-center gap-2">
-                                  <img src="https://i.pravatar.cc/150?u=evelyn" className="w-6 h-6 rounded-full border border-gray-100" alt="Evelyn" />
-                                  <div>
-                                      <div className="text-xs font-bold text-gray-800">Evelyn Milton</div>
-                                      <div className="text-[10px] text-gray-400">Database Admin</div>
-                                  </div>
-                              </div>
-                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <button className="p-1 bg-white border border-gray-200 rounded text-gray-400 hover:text-indigo-600"><Edit2 size={10} /></button>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-
-          {/* Ticket Details Card */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-              <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-sm font-bold text-gray-800">Ticket Details</h3>
-                  <ChevronDown size={14} className="text-gray-400 cursor-pointer" />
-              </div>
-              
-              <div className="space-y-4">
+      {/* Right Column: Ticket Info */}
+      <div className="w-80 flex flex-col gap-4 overflow-y-auto pr-1 pb-4">
+         
+         {/* Contact Details Card */}
+         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+             <div className="flex justify-between items-center mb-4 cursor-pointer">
+                 <h3 className="font-bold text-gray-900 text-sm">Contact Details</h3>
+                 <ChevronDown size={14} className="text-gray-400" />
+             </div>
+             
+             <div className="space-y-4">
+                 {/* Requester */}
                  <div>
-                    <div className="text-xs text-gray-500 mb-0.5 flex items-center gap-1"><Info size={10} /> Ticket ID</div>
-                    <div className="text-xs font-semibold text-gray-800">Case-1</div>
+                     <p className="text-xs text-gray-500 mb-2">Requester</p>
+                     <div className="flex items-center gap-3">
+                         <img src="https://i.pravatar.cc/150?u=john" alt="User" className="w-8 h-8 rounded-full" />
+                         <div className="overflow-hidden">
+                             <p className="text-sm font-bold text-gray-800">John Doe</p>
+                             <p className="text-xs text-gray-400 truncate">johndoe@gmail.com</p>
+                         </div>
+                         <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+                     </div>
                  </div>
 
-                 {/* Urgency Field */}
+                 {/* Requested For */}
                  <div>
-                    <div className="text-xs text-gray-500 mb-0.5 flex items-center gap-1"><AlertCircle size={10} /> Urgency</div>
-                    <select className="w-full text-xs font-semibold text-gray-800 border border-gray-200 rounded p-1.5 bg-gray-50 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors cursor-pointer">
-                        <option value="Urgent">Urgent</option>
-                        <option value="High">High</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Low">Low</option>
-                    </select>
+                     <p className="text-xs text-gray-500 mb-2">Requested For</p>
+                     <div className="flex items-center gap-3">
+                         <img src="https://i.pravatar.cc/150?u=john" alt="User" className="w-8 h-8 rounded-full" />
+                         <div className="overflow-hidden">
+                             <p className="text-sm font-bold text-gray-800">John Doe</p>
+                             <p className="text-xs text-gray-400 truncate">johndoe@gmail.com</p>
+                         </div>
+                         <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+                     </div>
+                 </div>
+
+                 {/* Agent */}
+                 <div>
+                     <p className="text-xs text-gray-500 mb-2">Agent</p>
+                     <div className="flex items-center gap-3">
+                         <img src="https://i.pravatar.cc/150?u=mike" alt="User" className="w-8 h-8 rounded-full" />
+                         <div className="overflow-hidden">
+                             <p className="text-sm font-bold text-gray-800">Mike Ross</p>
+                             <p className="text-xs text-gray-400 truncate">Support Agent</p>
+                         </div>
+                     </div>
+                 </div>
+
+                 {/* Second Layer Agent */}
+                 <div>
+                     <p className="text-xs text-gray-500 mb-2">Second Layer Agent</p>
+                     <div className="space-y-3">
+                         <div className="flex items-center gap-3">
+                             <img src="https://i.pravatar.cc/150?u=jane" alt="User" className="w-8 h-8 rounded-full" />
+                             <div>
+                                 <p className="text-sm font-bold text-gray-800">Jane Walker</p>
+                                 <p className="text-xs text-gray-400">Network Specialist</p>
+                             </div>
+                             <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+                         </div>
+                         <div className="flex items-center gap-3">
+                             <img src="https://i.pravatar.cc/150?u=evelyn" alt="User" className="w-8 h-8 rounded-full" />
+                             <div>
+                                 <p className="text-sm font-bold text-gray-800">Evelyn Milton</p>
+                                 <p className="text-xs text-gray-400">Database Admin</p>
+                             </div>
+                             <button className="ml-auto p-1 text-gray-300 hover:text-gray-600"><Edit2 size={12} /></button>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+
+         {/* Ticket Details Card */}
+         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+             <div className="flex justify-between items-center mb-4 cursor-pointer">
+                 <h3 className="font-bold text-gray-900 text-sm">Ticket Details</h3>
+                 <ChevronDown size={14} className="text-gray-400" />
+             </div>
+             
+             <div className="space-y-4">
+                 <div>
+                     <div className="flex items-center gap-1 text-gray-400 mb-1">
+                         <Info size={12} />
+                         <span className="text-xs">Ticket ID</span>
+                     </div>
+                     <p className="text-sm font-bold text-gray-800">Case-1</p>
                  </div>
 
                  <div>
-                    <div className="text-xs text-gray-500 mb-0.5 flex items-center gap-1"><RotateCcw size={10} /> Created Date</div>
-                    <div className="text-xs font-semibold text-gray-800">28 Feb 2025 - 10:40 PM</div>
+                     <label className="text-xs text-gray-500 block mb-1">Urgency</label>
+                     <select className="w-full text-xs border border-gray-200 rounded p-1.5 bg-gray-50 focus:outline-none">
+                         <option>Urgent</option>
+                         <option>High</option>
+                         <option>Medium</option>
+                         <option>Low</option>
+                     </select>
                  </div>
 
-                 {/* SLA Information */}
-                 <div className="border-t border-gray-100 pt-3 space-y-3">
-                    <div>
-                        <div className="text-[10px] font-bold text-gray-800">Standard SLA Response:</div>
-                        <div className="text-[10px] text-gray-500">3 hours</div>
-                    </div>
-                    <div>
-                        <div className="text-[10px] font-bold text-gray-800">Standard SLA Resolve:</div>
-                        <div className="text-[10px] text-gray-500">12 hours</div>
-                    </div>
-                    <div>
-                        <div className="text-[10px] font-bold text-gray-800">First Response Due Estimation:</div>
-                        <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] text-gray-500">02 Des 2025 15:30</span>
-                            <span className="bg-green-100 text-green-600 px-1.5 py-0.5 rounded text-[9px] font-bold">Within SLA</span>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="text-[10px] font-bold text-gray-800">Till First Response Due Estimation:</div>
-                        <div className="text-[10px] text-green-500 font-medium">+0 day 2 hours 29 minutes</div>
-                    </div>
-                    <div>
-                        <div className="text-[10px] font-bold text-gray-800">Resolve Due Estimation:</div>
-                        <div className="flex items-center gap-2 mt-0.5">
-                             <span className="text-[10px] text-gray-500">08 Des 2025 11:43</span>
-                             <span className="bg-green-100 text-green-600 px-1.5 py-0.5 rounded text-[9px] font-bold">Within SLA</span>
-                        </div>
-                    </div>
+                 <div>
+                     <div className="flex items-center gap-1 text-gray-400 mb-1">
+                         <RotateCcw size={12} />
+                         <span className="text-xs">Created Date</span>
+                     </div>
+                     <p className="text-sm font-bold text-gray-800">28 Feb 2025 - 10:40 PM</p>
+                 </div>
+
+                 {/* SLA Details */}
+                 <div className="pt-2 border-t border-gray-100 space-y-3">
                      <div>
-                        <div className="text-[10px] font-bold text-gray-800">Till Resolve Due Estimation:</div>
-                        <div className="text-[10px] text-green-500 font-medium">+0 day 12 hours 0 minutes</div>
-                    </div>
+                         <p className="text-xs font-bold text-gray-800">Standard SLA Response:</p>
+                         <p className="text-xs text-gray-500">3 hours</p>
+                     </div>
                      <div>
-                        <div className="text-[10px] font-bold text-gray-800">2nd Layer Resolution Timer:</div>
-                        <div className="text-[10px] text-gray-500">0 Minutes</div>
-                    </div>
+                         <p className="text-xs font-bold text-gray-800">Standard SLA Resolve:</p>
+                         <p className="text-xs text-gray-500">12 hours</p>
+                     </div>
+                     
+                     <div>
+                         <p className="text-xs font-bold text-gray-800">First Response Due Estimation:</p>
+                         <div className="flex items-center gap-2">
+                             <span className="text-xs text-gray-600">02 Dec 2025 15:30</span>
+                             <span className="text-[10px] bg-green-100 text-green-600 font-bold px-1.5 rounded">Within SLA</span>
+                         </div>
+                     </div>
+                     <div>
+                         <p className="text-xs font-bold text-gray-800">Till First Response Due Estimation:</p>
+                         <p className="text-xs font-bold text-teal-400">+0 day 2 hours 29 minutes</p>
+                     </div>
+
+                     <div>
+                         <p className="text-xs font-bold text-gray-800">Resolve Due Estimation:</p>
+                         <div className="flex items-center gap-2">
+                             <span className="text-xs text-gray-600">08 Dec 2025 11:43</span>
+                             <span className="text-[10px] bg-green-100 text-green-600 font-bold px-1.5 rounded">Within SLA</span>
+                         </div>
+                     </div>
+                     <div>
+                         <p className="text-xs font-bold text-gray-800">Till Resolve Due Estimation:</p>
+                         <p className="text-xs font-bold text-teal-400">+0 day 12 hours 0 minutes</p>
+                     </div>
+                     
+                     <div>
+                         <p className="text-xs font-bold text-gray-800">2nd Layer Resolution Timer:</p>
+                         <p className="text-xs text-gray-500">0 Minutes</p>
+                     </div>
                  </div>
 
                  <div>
-                    <div className="text-xs text-gray-500 mb-0.5 flex items-center gap-1"><MessageCircle size={10} /> Rating</div>
-                    <div className="flex text-yellow-400 text-xs">★★★★☆</div>
+                     <div className="flex items-center gap-1 text-gray-400 mb-1">
+                         <MessageCircle size={12} />
+                         <span className="text-xs">Rating</span>
+                     </div>
+                     <div className="flex text-yellow-400 text-xs">★★★★☆</div>
                  </div>
-                 <div className="bg-orange-50 p-2 rounded text-[10px] text-orange-600 leading-tight">
-                    I appreciate the prompt response and acknowledgment of my feedback. It's reassuring
-                    <br/><span className="underline font-bold cursor-pointer hover:text-orange-800">Show more</span>
-                 </div>
-              </div>
-          </div>
 
-           {/* Additional Details (Was Trello) */}
-           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-              <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-sm font-bold text-gray-800">Additional Details</h3>
-              </div>
-              
-              <div className="space-y-3">
-                 <div>
-                    <label className="text-[10px] font-semibold text-gray-600 mb-1 block">Impact</label>
-                    <input type="text" value="Low" readOnly className="w-full text-xs p-2 border border-gray-200 rounded-md bg-white text-gray-800 focus:outline-none" />
+                 <div className="bg-orange-50 border border-orange-100 p-3 rounded-lg text-xs text-orange-600 leading-relaxed">
+                     I appreciate the prompt response and acknowledgment of my feedback. It's reassuring
+                     <span className="block font-bold underline cursor-pointer mt-1">Show more</span>
                  </div>
+             </div>
+         </div>
+
+         {/* Trello Card Details (Renamed) */}
+         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+             <div className="flex justify-between items-center mb-4">
+                 <h3 className="font-bold text-gray-900 text-sm">Trello Card Details</h3>
+             </div>
+             
+             <div className="space-y-3">
                  <div>
-                    <label className="text-[10px] font-semibold text-gray-600 mb-1 block">Tagging</label>
-                    <input type="text" value="#SAP" readOnly className="w-full text-xs p-2 border border-gray-200 rounded-md bg-white text-gray-800 focus:outline-none" />
+                     <label className="text-xs text-gray-500 block mb-1">Impact</label>
+                     <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">Low</div>
                  </div>
+                 
                  <div>
-                    <label className="text-[10px] font-semibold text-gray-600 mb-1 block">Agent Group</label>
-                    <input type="text" value="Service Desk" readOnly className="w-full text-xs p-2 border border-gray-200 rounded-md bg-gray-50 text-gray-800 focus:outline-none" />
+                     <label className="text-xs text-gray-500 block mb-1">Tagging</label>
+                     <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">#SAP</div>
                  </div>
+
                  <div>
-                    <label className="text-[10px] font-semibold text-gray-600 mb-1 block">Priority</label>
-                    <input type="text" value="High" readOnly className="w-full text-xs p-2 border border-gray-200 rounded-md bg-gray-50 text-gray-800 focus:outline-none" />
+                     <label className="text-xs text-gray-500 block mb-1">Agent Group</label>
+                     <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">Service Desk</div>
                  </div>
-              </div>
-          </div>
+                 
+                 <div>
+                     <label className="text-xs text-gray-500 block mb-1">Priority</label>
+                     <div className="w-full text-sm border border-gray-200 rounded px-3 py-2 text-gray-700">High</div>
+                 </div>
+             </div>
+         </div>
 
       </div>
 
