@@ -48,7 +48,8 @@ import {
   Share2,
   Eye,
   MoreHorizontal,
-  PieChart
+  PieChart,
+  Archive
 } from 'lucide-react';
 
 // Enhanced Mock Data for Incident List
@@ -225,7 +226,7 @@ export const IncidentList: React.FC = () => {
   // State for selections and filters
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeListTab, setActiveListTab] = useState<'inbox' | 'draft' | 'sent'>('inbox');
+  const [activeListTab, setActiveListTab] = useState<'inbox'>('inbox');
 
   const [filters, setFilters] = useState({
     ticketNumber: '',
@@ -451,7 +452,7 @@ export const IncidentList: React.FC = () => {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800 mb-6">Incident Management</h1>
                     <div className="flex gap-8 border-b-2 border-transparent">
-                        {['Inbox', 'Draft', 'Sent'].map(tab => (
+                        {['Inbox'].map(tab => (
                             <button 
                                 key={tab}
                                 onClick={() => setActiveListTab(tab.toLowerCase() as any)}
@@ -472,10 +473,10 @@ export const IncidentList: React.FC = () => {
             <div className="grid grid-cols-5 gap-4 mb-6">
                 {[
                     { label: 'Total', count: 512, sub: '160 Active', sub2: '214 Closed', color: 'text-gray-800', icon: <PieChart size={24} className="text-gray-300" /> },
-                    { label: 'New', count: 53, sub: '+19 from yesterday', color: 'text-blue-600', icon: <AlertCircle size={24} className="text-blue-500" /> },
-                    { label: 'Open', count: 32, sub: '+19 from yesterday', color: 'text-orange-500', icon: <Clock size={24} className="text-orange-400" /> },
-                    { label: 'Unassigned', count: 12, sub: '+19 from yesterday', color: 'text-purple-600', icon: <Users size={24} className="text-purple-400" /> },
-                    { label: 'Closed', count: 76, sub: '+23 from yesterday', color: 'text-green-600', icon: <CheckCircle size={24} className="text-green-500" /> },
+                    { label: 'OPEN', count: 53, sub: '+19 from yesterday', color: 'text-blue-600', icon: <AlertCircle size={24} className="text-blue-500" /> },
+                    { label: 'Pending', count: 32, sub: '+19 from yesterday', color: 'text-orange-500', icon: <Clock size={24} className="text-orange-400" /> },
+                    { label: 'Resolved', count: 12, sub: '+19 from yesterday', color: 'text-green-600', icon: <CheckCircle size={24} className="text-green-500" /> },
+                    { label: 'Closed', count: 76, sub: '+23 from yesterday', color: 'text-gray-600', icon: <Archive size={24} className="text-gray-500" /> },
                 ].map((stat, idx) => (
                     <div key={idx} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
                         <div className="flex-1">
